@@ -1,0 +1,98 @@
+/* ==================================== */
+/* 1. 全局設定與基礎變數 */
+/* ==================================== */
+:root {
+    --color-primary: #004e92;      
+    --color-accent: #87bfff;       
+    --color-secondary: #333399;    
+    --color-background-main: #f9f9f9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 2rem 1rem;
+    background-color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+/* ==================================== */
+/* 2. 視覺特效：背景同步與局部霧化系統 */
+/* ==================================== */
+/* 所有層級都使用同一組背景對齊設定 */
+.bg-sync {
+    background-image: url('../images/base_map.jpg');
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+}
+
+/* 主容器：層級 1，承載高清背景 */
+.main-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 2.5rem;
+    padding: 3rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+/* 導覽卡片：層級 2，使用偽元素實現局部霧化 */
+.blur-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+    display: block;
+}
+
+.blur-card::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    background-image: inherit;
+    background-size: inherit;
+    background-position: inherit;
+    filter: blur(8px); /* 控制霧化感 */
+    z-index: -1;
+}
+
+.blur-card:hover { transform: scale(1.02); background: rgba(255, 255, 255, 0.5); }
+
+/* ==================================== */
+/* 3. 原有功能性樣式 (修正後) */
+/* ==================================== */
+.hero-section { text-align: center; padding: 20px 0; }
+.game-logo { width: 100px; height: 100px; border-radius: 20%; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+h1 { color: var(--color-primary); text-align: center; border-bottom: 3px solid var(--color-primary); padding-bottom: 10px; }
+h2 { color: var(--color-secondary); margin-top: 25px; border-bottom: 2px solid #ddd; }
+
+/* 統計表格與詳情 */
+.stats-table table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.stats-table th, .stats-table td { border: 1px solid var(--color-accent); padding: 8px; }
+.stats-table th { background-color: var(--color-accent); color: white; }
+
+.note { background-color: #e0f7fa; border-left: 5px solid #00bcd4; padding: 10px; margin-top: 15px; }
+
+/* 技能區塊 (保留響應式) */
+@media (min-width: 600px) {
+    .skill-section { display: flex; gap: 30px; }
+    .guide-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+}
+
+/* ==================================== */
+/* 4. 其餘排版 */
+/* ==================================== */
+.update-info { font-size: 0.75em; color: #aaa; text-align: center; margin-top: 30px; }
+ul { list-style: disc; padding-left: 20px; }

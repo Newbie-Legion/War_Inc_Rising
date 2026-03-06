@@ -1,0 +1,79 @@
+/* ==================================== */
+/* 1. 全局設定 */
+/* ==================================== */
+:root {
+    --color-primary: #004e92;      
+    --color-accent: #87bfff;       
+    --color-secondary: #333399;    
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 2rem 1rem;
+    background-color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+/* ==================================== */
+/* 2. 背景與霧化系統 */
+/* ==================================== */
+.bg-sync {
+    background-image: url('../images/base_map.jpg');
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+}
+
+/* 主圖層 (第二層)：調整為更銳利的邊角 */
+.main-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 1rem; /* 銳利邊角 */
+    padding: 3rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5); /* 畫框感 */
+    overflow: hidden;
+}
+
+/* 導覽卡片 (第三層)：保留局部霧化 */
+.blur-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 1.5rem;
+    border-radius: 1rem; /* 與主圖層呼應的圓角 */
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+}
+
+.blur-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: inherit;
+    background-size: inherit;
+    background-position: inherit;
+    filter: blur(8px);
+    z-index: -1;
+}
+
+.blur-card:hover { transform: translateY(-4px); background: rgba(255, 255, 255, 0.5); }
+
+/* ==================================== */
+/* 3. 既有元件樣式 */
+/* ==================================== */
+.hero-section { text-align: center; padding: 20px 0; }
+.game-logo { width: 100px; height: 100px; border-radius: 20%; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+h1 { color: var(--color-primary); text-align: center; border-bottom: 3px solid var(--color-primary); padding-bottom: 10px; }
+h2 { color: var(--color-secondary); margin-top: 25px; border-bottom: 2px solid #ddd; }
+.note { background-color: #e0f7fa; border-left: 5px solid #00bcd4; padding: 10px; margin-top: 15px; }
+.update-info { font-size: 0.75em; color: #aaa; text-align: center; margin-top: 30px; }
