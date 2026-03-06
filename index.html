@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>War Inc Rising - 非官方資料站</title>
-    <!-- 使用 Tailwind CSS 處理結構與間距 -->
+    <!-- 使用 Tailwind CSS 處理結構 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- 🚀 畫布：層級 15，風跡會清晰地吹過卡片表面 -->
+    <!-- 🚀 粒子畫布 -->
     <canvas id="windCanvas"></canvas>
 
+    <!-- 主容器：現在使用 margin: auto 確保 PC 絕對置中 -->
     <main class="main-container">
-        <!-- 🚀 內容層：層級 20，確保文字與按鈕在風的上方，絕對清晰 -->
+        <!-- 內容層級 z-20 -->
         <div class="relative z-20 w-full flex flex-col">
             
             <!-- Hero 標題區 -->
@@ -24,85 +25,62 @@
             
             <hr class="my-8 border-t border-black/10">
 
-            <!-- 招募區塊：完整文字還原 -->
+            <!-- 招募區塊 -->
             <section class="blur-card mb-10">
                 <h2 class="text-3xl font-bold text-blue-900 border-none mb-10 text-center">✨ [萌新軍本部] 招募</h2>
                 
-                <!-- 招募內文：靠左對齊、文字放大 -->
                 <div class="space-y-6 text-gray-900 leading-relaxed font-semibold text-xl text-left px-2 sm:px-6 mb-12">
                     <p>我們是一群熱衷於 <strong>War Inc Rising</strong> 的 (繁/簡)中文玩家，歡迎所有對遊戲有愛的玩家加入我們！</p>
-                    
                     <p>透過我們的 <strong>Discord</strong> 討論區，您可以獲得即時的技術交流、戰術指導，以及與夥伴共同合作的樂趣。我們樂於手把手教導新人，共同成長！</p>
-                    
                     <p>為了維持公會的頂尖競爭力，<strong>主公會</strong> 現正積極徵求 <strong>5400</strong> 分以上、且具備高度活躍和積極性的頂尖玩家！</p>
-                    
-                    <p>另設<strong>分公會</strong>，招收條件為雖未滿5400分但<strong>自認為是積極、高度活躍的國戰型態玩家</strong>或者高潛力新玩家。另公會Discord公開開放給所有想要交流的中文玩家加入，提供一個良好正向的中文討論頻道！</p>
+                    <p>另設<strong>分公會</strong>，招收條件為雖未滿5400分但<strong>自認為是積極、高度活躍的國戰型態玩家</strong>或者<strong>高潛力新玩家</strong>。另公會Discord公開開放給所有想要交流的中文玩家加入，提供一個良好正向的中文討論頻道！</p>
                 </div>
 
-                <!-- 按鈕組：底部置中 -->
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="guides/guild_application.html" class="bg-blue-700 text-white px-8 py-3 rounded-xl text-center font-bold shadow-md hover:bg-blue-800 transition-all duration-200 text-lg">
-                        🌐 公會申請教學 (附圖)
-                    </a>
-                    <a href="https://discord.gg/UKgG3CxsZD" target="_blank" class="bg-emerald-700 text-white px-8 py-3 rounded-xl text-center font-bold shadow-md hover:bg-emerald-800 transition-all duration-200 text-lg">
-                        💬 加入 Discord 討論區
-                    </a>
+                    <a href="guides/guild_application.html" class="bg-blue-700 text-white px-8 py-3 rounded-xl text-center font-bold shadow-md hover:bg-blue-800 transition-all duration-200 text-lg">🌐 公會申請教學 (附圖)</a>
+                    <a href="https://discord.gg/UKgG3CxsZD" target="_blank" class="bg-emerald-700 text-white px-8 py-3 rounded-xl text-center font-bold shadow-md hover:bg-emerald-800 transition-all duration-200 text-lg">💬 加入 Discord 討論區</a>
                 </div>
             </section>
 
             <!-- 導覽區域 -->
-            <div class="h-12 w-full"></div> 
+            <div class="h-12"></div> 
             <section>
                 <h2 class="text-2xl font-bold text-blue-900 mb-2 ml-2">🚀 導覽</h2>
                 <p class="text-gray-800 ml-2 mb-8 font-medium text-lg opacity-90">點擊下方卡片，快速進入您感興趣的資料頁面。</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
                     <a href="buildings/building_list.html" class="blur-card flex flex-col items-center text-center">
-                        <div class="icon-wrapper">
-                            <img src="assets/images/icon_building.png" alt="建築" class="card-icon">
-                        </div>
+                        <div class="icon-wrapper"><img src="assets/images/icon_building.png" alt="建築" class="card-icon"></div>
                         <div class="text-content">
                             <h3 class="text-2xl font-bold text-blue-950 mb-1">建築</h3>
                             <p class="text-gray-700 text-lg opacity-80 font-medium">建築物基本介紹</p>
                         </div>
                     </a>
-
                     <a href="units/troops_introduction.html" class="blur-card flex flex-col items-center text-center">
-                        <div class="icon-wrapper">
-                            <img src="assets/images/icon_soldier.png" alt="士兵" class="card-icon">
-                        </div>
+                        <div class="icon-wrapper"><img src="assets/images/icon_soldier.png" alt="士兵" class="card-icon"></div>
                         <div class="text-content">
                             <h3 class="text-2xl font-bold text-blue-950 mb-1">士兵介紹</h3>
                             <p class="text-gray-700 text-lg opacity-80 font-medium">單位基本介紹</p>
                         </div>
                     </a>
-
                     <a href="modes/modes_list.html" class="blur-card flex flex-col items-center text-center">
-                        <div class="icon-wrapper">
-                            <img src="assets/images/icon_mode.png" alt="遊戲模式" class="card-icon">
-                        </div>
+                        <div class="icon-wrapper"><img src="assets/images/icon_mode.png" alt="遊戲模式" class="card-icon"></div>
                         <div class="text-content">
                             <h3 class="text-2xl font-bold text-blue-950 mb-1">遊戲模式</h3>
                             <p class="text-gray-700 text-lg opacity-80 font-medium">模式基本介紹</p>
                         </div>
                     </a>
-
                     <a href="tutorials/tutorial_main.html" class="blur-card flex flex-col items-center text-center">
-                        <div class="icon-wrapper">
-                            <img src="assets/images/icon_guide.png" alt="綜合攻略" class="card-icon">
-                        </div>
+                        <div class="icon-wrapper"><img src="assets/images/icon_guide.png" alt="綜合攻略" class="card-icon"></div>
                         <div class="text-content">
                             <h3 class="text-2xl font-bold text-blue-950 mb-1">綜合攻略</h3>
                             <p class="text-gray-800 text-lg opacity-80 font-medium">持續更新中</p>
                         </div>
                     </a>
-
                 </div>
             </section> 
         
-            <div class="h-24 w-full"></div>
-
+            <div class="h-24"></div>
             <div class="note mb-10">
                 <strong>免責聲明：</strong> 本網站為玩家自製的非官方資料站，所有數據和資訊以遊戲內實際內容為準。
             </div>
