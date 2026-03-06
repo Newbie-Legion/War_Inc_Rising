@@ -1,5 +1,5 @@
 /* ==================================== */
-/* 1. 全局設定 */
+/* 全局設定：背景圖全螢幕化 */
 /* ==================================== */
 * { box-sizing: border-box; }
 
@@ -7,43 +7,36 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #cbd5e1; /* 背景色作為兩側銜接 */
+    /* 背景圖直接設定在 body，滿版延伸 */
+    background-image: url('../images/base_map.jpg');
+    background-size: cover;
+    background-position: center bottom;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-color: #cbd5e1;
     min-height: 100vh;
     display: flex;
     justify-content: center;
 }
 
-/* ==================================== */
-/* 2. 背景與霧化系統 (固定背景核心) */
-/* ==================================== */
-.bg-sync {
-    background-image: url('../images/base_map.jpg');
-    background-size: cover;
-    background-position: center bottom;
-    background-repeat: no-repeat;
-    /* 關鍵：固定背景不隨滾動移動 */
-    background-attachment: fixed;
-}
-
-/* 主圖層：移除圓角與陰影，與兩側背景僅由極細線條區分 */
+/* 主容器：現在變成一個半透明的磨砂玻璃層 */
 .main-container {
-    position: relative;
     width: 100%;
     max-width: 900px;
-    background-color: rgba(255, 255, 255, 0.4);
-    border-radius: 0; 
+    background-color: rgba(255, 255, 255, 0.4); /* 半透明底色 */
+    backdrop-filter: blur(12px);                /* 核心：中間區域產生霧化透視感 */
+    -webkit-backdrop-filter: blur(12px);
     padding: 3rem;
-    box-shadow: none;
-    border-left: 1px solid rgba(0, 0, 0, 0.05);
-    border-right: 1px solid rgba(0, 0, 0, 0.05);
-    overflow: visible;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    min-height: 100vh;
 }
 
-/* 導覽卡片 (局部霧化效果) */
+/* 導覽卡片：局部霧化 */
 .blur-card {
     position: relative;
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     padding: 1.5rem;
     border-radius: 0.5rem;
     overflow: hidden;
@@ -52,27 +45,15 @@ body {
     display: block;
 }
 
-.blur-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: inherit;
-    background-size: inherit;
-    background-position: inherit;
-    /* 霧化與背景同步，達成視差對齊 */
-    background-attachment: fixed;
-    filter: blur(8px);
-    z-index: -1;
-}
-
+/* 為了與全螢幕背景同步，卡片不需要再做 ::before 複製背景，直接透出即可 */
 .blur-card:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.5); }
 
 /* ==================================== */
-/* 3. 既有元件樣式 */
+/* 既有元件樣式 */
 /* ==================================== */
 .hero-section { text-align: center; padding: 20px 0; }
 .game-logo { width: 100px; height: 100px; border-radius: 15%; margin-bottom: 15px; }
 h1 { color: #004e92; text-align: center; border-bottom: 2px solid #004e92; padding-bottom: 10px; }
 h2 { color: #333399; margin-top: 25px; border-bottom: 1px solid #ddd; }
-.note { background-color: rgba(224, 247, 250, 0.7); border-left: 4px solid #00bcd4; padding: 10px; margin-top: 15px; }
-.update-info { font-size: 0.75em; color: #666; text-align: center; margin-top: 30px; padding-bottom: 20px; }
+.note { background-color: rgba(255, 255, 255, 0.5); border-left: 4px solid #00bcd4; padding: 10px; margin-top: 15px; }
+.update-info { font-size: 0.75em; color: #444; text-align: center; margin-top: 30px; padding-bottom: 20px; }
