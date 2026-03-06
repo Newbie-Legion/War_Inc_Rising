@@ -1,0 +1,238 @@
+/* ==================================== */
+/* 1. 核心底層與平滑捲動 */
+/* ==================================== */
+* { 
+    box-sizing: border-box; 
+    scroll-behavior: smooth; /* 點擊導覽連結時平滑捲動 */
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden; /* 強制消除水平滾動條 */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('../images/base_map.jpg');
+    background-size: cover;
+    background-position: center bottom;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-color: #cbd5e1;
+    min-height: 100vh;
+    /* 使用 Flex 佈局確保內容區在 PC 上絕對居中 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ==================================== */
+/* 2. 三明治層級系統 (Z-Index) */
+/* ==================================== */
+
+/* 🚀 粒子畫布：層級 15 (位於玻璃之上，文字之下) */
+#windCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 15; 
+    pointer-events: none; /* 滑鼠穿透 */
+}
+
+/* 🚀 主內容容器：層級 10 (背景層) */
+.main-container {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.25); /* 輕透背景 */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 3rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    min-height: 100vh;
+    position: relative;
+    z-index: 10;
+}
+
+/* ==================================== */
+/* 3. 遊戲 Logo 樣式與浮動動畫 */
+/* ==================================== */
+.game-logo {
+    width: 120px !important;
+    height: 120px !important;
+    border-radius: 20%;
+    margin-bottom: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+}
+
+.animate-float {
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* ==================================== */
+/* 4. 進階霧面卡片系統 (珍珠淺灰白) */
+/* ==================================== */
+.blur-card {
+    position: relative;
+    background: rgba(242, 242, 242, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 2.5rem 2rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    /* 敏銳動畫反應 0.15s */
+    transition: transform 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* 卡片懸停效果：純粹位移與變亮，不歪斜 */
+a.blur-card:hover { 
+    transform: translateY(-5px); 
+    background: rgba(255, 255, 255, 0.85); 
+    box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.6), 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.blur-card:not(a):hover { cursor: default; }
+
+/* ==================================== */
+/* 5. 圖片掃光效果與圖標優化 */
+/* ==================================== */
+.icon-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    background: transparent !important;
+    border-radius: 1rem;
+}
+
+/* 光澤掃過遮罩層 */
+.icon-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        to right, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.35) 50%, 
+        rgba(255,255,255,0) 100%
+    );
+    transform: skewX(-25deg);
+    pointer-events: none;
+    opacity: 0;
+}
+
+/* 當卡片進入視窗 (Active) 時啟動掃光 */
+.blur-card.active .icon-wrapper::after {
+    animation: lightSweep 1.2s ease-in-out 0.6s forwards;
+}
+
+@keyframes lightSweep {
+    0% { left: -150%; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { left: 200%; opacity: 0; }
+}
+
+/* 3D 圖標樣式：鎖定比例且投影乾淨 */
+.card-icon {
+    width: 65%;
+    max-width: 160px;
+    height: auto;
+    /* 微調投影濃度 0.1，解決去背色差問題 */
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+    transition: transform 0.2s ease-out;
+    image-rendering: -webkit-optimize-contrast; /* 強化 PNG 銳利度 */
+}
+
+/* 懸停時圖標微幅放大，保持水平不旋轉 */
+a.blur-card:hover .card-icon {
+    transform: scale(1.08); 
+}
+
+/* ==================================== */
+/* 6. 滾動進場特效 (Reveal) */
+/* ==================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.15, 0.85, 0.35, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+
+/* ==================================== */
+/* 7. 其他視覺組件 */
+/* ==================================== */
+.hero-section { text-align: center; padding: 20px 0; }
+
+h1 { color: #004e92; border-bottom: 2px solid #004e92; padding-bottom: 10px; }
+h2 { color: #333399; margin-top: 25px; border-bottom: 1px solid #ddd; }
+
+.note { 
+    background-color: rgba(255, 255, 255, 0.4); 
+    border-left: 5px solid #00bcd4; 
+    padding: 15px; 
+    border-radius: 0 8px 8px 0; 
+    font-weight: 600; 
+    font-size: 1.15rem; 
+}
+
+/* 頁腳小字置右 */
+.update-info { 
+    width: 100%;
+    text-align: right;
+    font-size: 0.75rem;
+    color: #333;
+    opacity: 0.8;
+    font-weight: bold;
+    margin-top: 2rem;
+    line-height: 1.6;
+}
+
+/* ==================================== */
+/* 8. 手機版適配調整 (RWD) */
+/* ==================================== */
+@media (max-width: 768px) {
+    .main-container { 
+        padding: 1.5rem 1rem; 
+        border-left: none; 
+        border-right: none;
+    }
+
+    .card-icon { width: 55%; }
+    
+    h1 { font-size: 1.8rem; }
+    
+    .blur-card { 
+        padding: 2rem 1.25rem; 
+        border-radius: 1.25rem;
+    }
+}
