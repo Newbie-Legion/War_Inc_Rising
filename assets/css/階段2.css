@@ -25,7 +25,7 @@ body {
     background-color: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 3rem; /* 電腦版保持寬裕間距 */
+    padding: 3rem;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
     border-right: 1px solid rgba(255, 255, 255, 0.2);
     min-height: 100vh;
@@ -34,29 +34,31 @@ body {
 /* 通用霧面卡片樣式 */
 .blur-card {
     position: relative;
-    background: rgba(242, 242, 242, 0.65);
+    background: rgba(242, 242, 242, 0.65); /* 輕透灰白底色 */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.5);
     padding: 1.5rem;
     border-radius: 1.25rem;
     overflow: hidden;
+    /* 敏銳動畫反應 */
     transition: transform 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.15s ease-out;
     display: block;
     text-decoration: none;
     box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-/* 懸停動態效果 */
+/* 懸停動態效果 (僅限連結 a 標籤) */
 a.blur-card:hover { 
     transform: translateY(-3px); 
     background: rgba(255, 255, 255, 0.85); 
     box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.6), 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* 非連結卡片 hover 時不改變滑鼠 */
 .blur-card:not(a):hover { cursor: default; }
 
-/* 視覺組件 */
+/* 標題與視覺組件 */
 .hero-section { text-align: center; padding: 20px 0; }
 .game-logo { width: 100px; height: 100px; border-radius: 20%; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 h1 { color: #004e92; text-align: center; border-bottom: 2px solid #004e92; padding-bottom: 10px; }
@@ -71,6 +73,7 @@ h2 { color: #333399; margin-top: 25px; border-bottom: 1px solid #ddd; }
     font-size: 1.15rem;
 }
 
+/* 🚀 更新：頁腳置右設定 */
 .update-info { 
     font-size: 0.85em; 
     color: #333; 
@@ -81,28 +84,6 @@ h2 { color: #333399; margin-top: 25px; border-bottom: 1px solid #ddd; }
     line-height: 1.6;
 }
 
-/* ==================================== */
-/* 🚀 關鍵修改：手機版縮減邊距 */
-/* ==================================== */
 @media (max-width: 768px) {
-    /* 1. 讓內容區域更貼近邊緣 */
-    .main-container { 
-        padding: 1.5rem 1rem; /* 左右內距縮減為 1rem */
-        border-left: none;    /* 移除邊框線讓視覺更開闊 */
-        border-right: none;
-    }
-
-    /* 2. 稍微調整文字大小避免擁擠 */
-    h1 { font-size: 1.6rem; }
-    .hero-section h1 { padding-bottom: 5px; }
-    
-    /* 3. 招募區塊文字在手機上稍微縮小一點點 (原本 text-xl 太大) */
-    .blur-card .space-y-6 { font-size: 1.1rem; }
-}
-
-@media (max-width: 480px) {
-    /* 在極小螢幕上進一步壓低邊距 */
-    .main-container { 
-        padding: 1rem 0.75rem; 
-    }
+    .main-container { padding: 1.5rem; }
 }
