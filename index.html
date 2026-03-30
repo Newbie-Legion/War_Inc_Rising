@@ -8,87 +8,66 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- 🚀 層級 15：風之軌跡 -->
     <canvas id="windCanvas"></canvas>
 
     <main class="main-container">
-        <!-- 🚀 層級 20：內容主體 -->
         <div class="relative z-20 w-full flex flex-col">
             
+            <!-- Hero 區塊 -->
             <div class="hero-section">
-                <img src="assets/images/War Inc Rising Logo.webp" alt="Logo" class="game-logo mx-auto animate-float">
-                <h1 class="text-4xl font-bold mb-4 text-blue-900 text-center">歡迎來到 War Inc Rising <span class="text-blue-500 font-black">非</span>官方資料站</h1>
+                <img src="assets/images/War Inc Rising Logo.webp" alt="Logo" class="game-logo">
+                <h1>歡迎來到 War Inc Rising <span class="not-official">非</span>官方資料站</h1>
             </div>
             
-            <hr class="my-8 border-t border-black/10">
+            <hr class="my-4 border-t border-black/10">
 
             <!-- 招募區塊 -->
-            <section class="blur-card mb-10 reveal">
-                <h2 class="text-3xl font-bold text-blue-900 border-none mb-10 text-center">✨ [萌新軍本部] 招募</h2>
-                <div class="space-y-6 text-gray-900 leading-relaxed font-semibold text-xl text-left px-2 sm:px-6 mb-12">
-                    <p>我們是一群熱衷於 <strong>War Inc Rising</strong> 的中文玩家，歡迎所有對遊戲有愛的玩家加入我們！透過 Discord 您可以獲得即時技術交流、戰術指導，以及共同合作的樂趣。</p>
-                    <p>主公會徵求 5400 分以上頂尖玩家；另設分公會招收積極活躍的國戰型玩家。Discord 公開開放交流！</p>
+            <section class="blur-card mb-8 reveal">
+                <h2 class="text-2xl md:text-3xl font-bold text-blue-900 border-none mb-8 text-center">✨ [萌新軍本部] 招募</h2>
+                <div class="space-y-5 text-gray-900 leading-relaxed font-semibold text-lg md:text-xl text-left px-2 sm:px-6 mb-10">
+                    <p>我們是一群熱衷於 <strong>War Inc Rising</strong> 的中文玩家。透過 Discord，您可以獲得即時技術交流、戰術指導與夥伴合作樂趣！</p>
+                    <p>主公會徵求 <strong>5400</strong> 分以上玩家；另設分公會招收積極玩家。Discord 公開開放交流！</p>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="guides/guild_application.html" class="bg-blue-700 text-white px-8 py-3 rounded-xl text-center font-bold shadow-md hover:bg-blue-800 transition-all text-lg">🌐 公會申請教學 (附圖)</a>
-                    <a href="https://discord.gg/UKgG3CxsZD" target="_blank" class="bg-emerald-700 text-white px-8 py-3 rounded-xl text-center font-bold shadow-md hover:bg-emerald-800 transition-all text-lg">💬 加入 Discord 討論區</a>
+                    <a href="guides/guild_application.html" class="bg-blue-700 text-white px-6 py-3 rounded-xl text-center font-bold shadow-md hover:bg-blue-800 transition-all text-lg">🌐 公會申請教學 (附圖)</a>
+                    <a href="https://discord.gg/UKgG3CxsZD" target="_blank" class="bg-emerald-700 text-white px-6 py-3 rounded-xl text-center font-bold shadow-md hover:bg-emerald-800 transition-all text-lg">💬 加入 Discord 討論區</a>
                 </div>
             </section>
 
-            <!-- 導覽區域：具備精確交錯動畫 -->
-            <div class="h-12 w-full"></div> 
-            <section>
-                <h2 class="text-2xl font-bold text-blue-900 mb-2 ml-2 reveal">🚀 導覽</h2>
-                <p class="text-gray-800 ml-2 mb-8 font-medium text-lg opacity-90 reveal">點擊下方卡片，快速進入您感興趣的資料頁面。</p>
+            <!-- 🚀 導覽區域：PC 2欄 / 手機 1欄 -->
+            <div class="h-6 w-full"></div> 
+            <section class="reveal">
+                <h2 class="text-xl md:text-2xl font-bold text-blue-900 mb-2 ml-2">🚀 導覽</h2>
+                <p class="text-gray-800 ml-2 mb-8 font-bold text-lg opacity-90">點擊下方卡片，快速進入您感興趣的資料頁面。</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- 建築 -->
                     <a href="buildings/building_list.html" class="blur-card reveal delay-1">
                         <div class="icon-wrapper"><img src="assets/images/icon_building.png" alt="建築" class="card-icon"></div>
-                        <div class="text-content">
-                            <h3>建築</h3>
-                            <p>建築物基本介紹</p>
-                        </div>
+                        <div class="text-content"><h3>建築</h3><p>建築物基本介紹</p></div>
                     </a>
-                    <!-- 士兵 -->
                     <a href="units/troops_introduction.html" class="blur-card reveal delay-2">
                         <div class="icon-wrapper"><img src="assets/images/icon_soldier.png" alt="士兵" class="card-icon"></div>
-                        <div class="text-content">
-                            <h3>士兵介紹</h3>
-                            <p>單位基本介紹</p>
-                        </div>
+                        <div class="text-content"><h3>士兵介紹</h3><p>單位基本介紹</p></div>
                     </a>
-                    <!-- 模式 -->
-                    <a href="modes/modes_list.html" class="blur-card reveal delay-3">
-                        <div class="icon-wrapper"><img src="assets/images/icon_mode.png" alt="遊戲模式" class="card-icon"></div>
-                        <div class="text-content">
-                            <h3>遊戲模式</h3>
-                            <p>模式基本介紹</p>
-                        </div>
+                    <a href="modes/modes_list.html" class="blur-card reveal delay-1">
+                        <div class="icon-wrapper"><img src="assets/images/icon_mode.png" alt="模式" class="card-icon"></div>
+                        <div class="text-content"><h3>遊戲模式</h3><p>模式基本介紹</p></div>
                     </a>
-                    <!-- 攻略 -->
-                    <a href="tutorials/tutorial_main.html" class="blur-card reveal delay-4">
+                    <a href="tutorials/tutorial_main.html" class="blur-card reveal delay-2">
                         <div class="icon-wrapper"><img src="assets/images/icon_guide.png" alt="攻略" class="card-icon"></div>
-                        <div class="text-content">
-                            <h3>綜合攻略</h3>
-                            <p>持續更新中</p>
-                        </div>
+                        <div class="text-content"><h3>綜合攻略</h3><p>持續更新中</p></div>
                     </a>
                 </div>
             </section> 
-        
-            <div class="h-24 w-full"></div>
-            <div class="note mb-10 reveal">
-                <strong>免責聲明：</strong> 本網站為玩家自製，數據資訊以遊戲內實際內容為準。
-            </div>
-            <footer class="update-info text-right">
+
+            <footer class="update-info">
                 © 版權所有，請勿盜用 | 內容更新：2026/01/04
             </footer>
         </div>
     </main>
 
     <script>
-        /* 風之粒子腳本 (層級鎖定在 15) */
+        /* 粒子與捲動偵測腳本維持不變，已優化觸發門檻 */
         const canvas = document.getElementById('windCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -96,45 +75,26 @@
         class Wind {
             constructor() { this.reset(); }
             reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.length = Math.random() * 80 + 40;
-                this.thickness = Math.random() * 1.2 + 0.5;
-                this.speed = Math.random() * 0.8 + 0.4;
-                this.opacity = Math.random() * 0.3 + 0.15;
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.length = Math.random() * 80 + 40; this.thickness = Math.random() * 1.2 + 0.5;
+                this.speed = Math.random() * 0.8 + 0.4; this.opacity = Math.random() * 0.3 + 0.15;
             }
-            update() {
-                this.x += this.speed;
-                this.y += Math.sin(this.x / 150) * 0.3;
-                if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; }
-            }
+            update() { this.x += this.speed; this.y += Math.sin(this.x / 150) * 0.3; if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; } }
             draw() {
-                ctx.beginPath();
-                const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y);
-                grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-                grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`);
+                ctx.beginPath(); const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0)'); grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`);
                 ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round';
                 ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke();
             }
         }
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
-        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
         window.addEventListener('resize', () => { initCanvas(); particles=[]; for(let i=0; i<35; i++) particles.push(new Wind()); });
         initCanvas(); for(let i=0; i<35; i++) particles.push(new Wind()); animate();
 
-        /* 滾動偵測與 Active 啟動 */
         document.addEventListener('DOMContentLoaded', () => {
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                        // 這裡不用 unobserve，因為需要多次捲動時的穩定狀態
-                    }
-                });
-            }, { threshold: 0.1 });
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.05 });
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         });
     </script>
