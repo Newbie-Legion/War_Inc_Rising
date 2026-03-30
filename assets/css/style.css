@@ -1,240 +1,126 @@
 /* ==================================== */
-/* 1. 核心變數與底層設定 (融合原始配色) */
+/* 1. 核心底層 */
 /* ==================================== */
-:root {
-    --color-primary: #004e92;      
-    --color-accent: #87bfff;       
-    --color-secondary: #333399;    
-    --color-background-card: rgba(242, 242, 242, 0.75); /* 新版玻璃底色 */
-    --color-text-main: #333;       
-}
-
-* { 
-    box-sizing: border-box; 
-    scroll-behavior: smooth; 
-}
-
-html, body {
-    margin: 0; padding: 0;
-    width: 100%; overflow-x: hidden;
-}
+* { box-sizing: border-box; scroll-behavior: smooth; }
+html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
 
 body {
-    /* 🚀 PC 字體自動放大縮放邏輯 */
-    font-size: clamp(16px, 1vw + 12px, 19px);
+    /* 🚀 字體回歸舒適大小：基礎 16px - 18px */
+    font-size: clamp(16px, 0.8vw + 12px, 18px);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-image: url('../images/base_map.jpg');
-    background-size: cover;
-    background-position: center bottom;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-color: #cbd5e1;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.6;
+    background-size: cover; background-position: center bottom;
+    background-attachment: fixed; background-repeat: no-repeat;
+    background-color: #cbd5e1; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
 }
 
 /* ==================================== */
-/* 2. 三明治層級系統 (Z-Index) */
+/* 2. 主容器：縮減頂部留白 */
 /* ==================================== */
-#windCanvas {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    z-index: 15; pointer-events: none;
-}
-
 .main-container {
-    width: 100%;
-    max-width: 960px;
+    width: 100%; max-width: 960px;
     margin: 0 auto;
     background-color: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 3rem;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    /* 🚀 關鍵修改：頂部 padding 從 4rem 降至 1.5rem */
+    padding: 1.5rem 2rem 3rem; 
     border-left: 1px solid rgba(255, 255, 255, 0.2);
     border-right: 1px solid rgba(255, 255, 255, 0.2);
-    min-height: 100vh;
-    position: relative;
-    z-index: 10;
+    min-height: 100vh; position: relative; z-index: 10;
 }
 
+#windCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 15; pointer-events: none; }
+
 /* ==================================== */
-/* 3. 玻璃卡片引擎 (取代原有的 Jumbotron 與 Card-item) */
+/* 3. Hero 標題區：精緻化修正 */
+/* ==================================== */
+.hero-section { 
+    text-align: center; 
+    /* 🚀 移除上方多餘間距 */
+    padding: 0 0 15px; 
+    width: 100%; 
+}
+
+.game-logo {
+    /* 🚀 Logo 回歸精緻尺寸 */
+    width: 100px !important; height: 100px !important; 
+    border-radius: 20%; 
+    margin: 0 auto 15px !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+h1 {
+    color: #004e92;
+    /* 🚀 關鍵修改：字體縮小至平衡範圍 */
+    font-size: clamp(1.8rem, 4vw, 2.6rem) !important; 
+    line-height: 1.3 !important;
+    margin: 0 auto 15px;
+    font-weight: 800;
+    border-bottom: 3px solid #004e92;
+    padding-bottom: 10px;
+    max-width: 90%;
+}
+
+h1 .not-official { color: #87bfff; font-weight: 900; margin: 0 4px; }
+
+/* ==================================== */
+/* 4. 玻璃卡片系統 (加速版 + 大圖) */
 /* ==================================== */
 .blur-card {
     position: relative;
-    background: var(--color-background-card);
+    background: rgba(242, 242, 242, 0.75);
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 2.5rem 2rem;
-    border-radius: 1.5rem;
+    padding: 2.5rem 2rem; border-radius: 1.5rem;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column; align-items: center;
     box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    transition: transform 0.2s ease-out, background-color 0.2s ease;
 }
 
-/* 🚀 極致柔和掃光特效 */
-.blur-card::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -150%; width: 120%; height: 100%;
-    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%);
-    transform: skewX(-20deg);
-    pointer-events: none; z-index: 25;
-    filter: blur(10px);
-}
-
-.blur-card.active::after {
-    animation: lightSweepDetailed 4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
-}
-
-@keyframes lightSweepDetailed {
-    from { left: -150%; opacity: 0; }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
-    to { left: 350%; opacity: 0; }
-}
-
-a.blur-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.9); }
-.blur-card:not(a):hover { cursor: default; }
-
-/* ==================================== */
-/* 4. 原始功能樣式還原 (表格、技能、提示) */
-/* ==================================== */
-
-/* 表格樣式修正：在玻璃背景下保持清晰 */
-.stats-table, .skill-detail {
-    background-color: rgba(255, 255, 255, 0.3);
-    padding: 15px;
-    border-radius: 12px;
-    margin-top: 15px;
-}
-
-.stats-table table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 0.95em;
-}
-
-.stats-table th, .stats-table td {
-    border: 1px solid var(--color-accent);
-    padding: 10px;
-    text-align: left;
-    color: #222;
-}
-
-.stats-table th {
-    background-color: var(--color-primary);
-    color: white;
-}
-
-/* 技能區塊 (保留並優化 RWD) */
-.skill-section {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 30px;
-    gap: 20px;
-}
-
-.skill-info { width: 100%; }
-.skill-screenshot img {
-    width: 100%;
-    max-width: 400px;
-    border: 3px solid var(--color-accent);
-    border-radius: 12px;
-    display: block;
-    margin: 10px auto;
-}
-
-/* 原有的 Note 提示框 */
-.note { 
-    background-color: rgba(224, 247, 250, 0.6); 
-    border-left: 6px solid #00bcd4; 
-    padding: 20px; 
-    border-radius: 0 12px 12px 0; 
-    font-weight: 600; 
-    font-size: 1.1rem;
-    margin: 20px 0;
-}
-
-ul { list-style: disc; padding-left: 25px; }
-
-/* ==================================== */
-/* 5. 標題與視覺組件 */
-/* ==================================== */
-.hero-section { text-align: center; padding: 20px 0; }
-.game-logo {
-    width: 120px !important; height: 120px !important;
-    border-radius: 20%; margin-bottom: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.animate-float { animation: floating 3s ease-in-out infinite; }
-@keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-h1 { color: var(--color-primary); border-bottom: 3px solid var(--color-primary); padding-bottom: 10px; font-weight: 800; }
-h2 { color: var(--color-secondary); border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 5px; }
-h3 { color: var(--color-primary); font-weight: bold; }
-
-/* ==================================== */
-/* 6. 動畫與交互細節 */
-/* ==================================== */
-.icon-wrapper {
-    position: relative; width: 100%; display: flex; justify-content: center;
-    margin-bottom: 2rem; background: transparent !important;
-}
-
+.icon-wrapper { position: relative; width: 100%; display: flex; justify-content: center; margin-bottom: 1.5rem; }
 .card-icon {
-    width: 65%; max-width: 170px; height: auto; opacity: 0;
-    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+    width: 80%; max-width: 240px; /* 🚀 圖片大小適中 */
+    height: auto; opacity: 0; transform: scale(0.6);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
 }
 
-.blur-card.active .card-icon {
-    animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards;
+/* 動畫提速 (與上一版保持一致的高效率) */
+.blur-card.active .card-icon { animation: bounceInFast 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s forwards; }
+@keyframes bounceInFast { 0% { opacity: 0; transform: scale(0.6) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+.text-content { width: 100%; text-align: center; }
+.text-content h3 { font-size: 1.6rem; font-weight: 800; color: #1e3a8a; margin: 0; opacity: 0; }
+.text-content p { font-size: 1.15rem; color: #4b5563; margin-top: 0.5rem; opacity: 0; }
+
+.blur-card.active .text-content h3 { animation: slideUpRevealFast 0.4s ease-out 0.3s forwards; }
+.blur-card.active .text-content p { animation: slideUpRevealFast 0.4s ease-out 0.4s forwards; }
+@keyframes slideUpRevealFast { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+.blur-card::after {
+    content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg); pointer-events: none; z-index: 25; filter: blur(8px);
 }
+.blur-card.active::after { animation: lightSweepFast 2s ease-in-out 0.4s forwards; }
+@keyframes lightSweepFast { from { left: -150%; } to { left: 350%; } }
 
-@keyframes bounceIn {
-    0% { opacity: 0; transform: scale(0.5) translateY(30px); }
-    70% { opacity: 1; transform: scale(1.05); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-/* 文字交錯序列 */
-.blur-card.active h2, .blur-card.active h3 { animation: slideUpReveal 0.6s ease-out 0.6s forwards; opacity: 0; }
-.blur-card.active p, .blur-card.active div { animation: slideUpReveal 0.6s ease-out 0.8s forwards; opacity: 0; }
-
-@keyframes slideUpReveal {
-    from { opacity: 0; transform: translateY(25px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+/* 交互與 Reveal */
+a.blur-card:hover { transform: translateY(-6px); background: rgba(255, 255, 255, 0.9); }
+.reveal { opacity: 0; transform: translateY(30px); transition: all 0.5s ease-out; }
 .reveal.active { opacity: 1; transform: translateY(0); }
 
-/* ==================================== */
-/* 7. 頁腳與手機適配 */
-/* ==================================== */
-.update-info { 
-    width: 100%; text-align: right; 
-    font-size: 0.75rem; color: #444; opacity: 0.8; 
-    font-weight: bold; margin-top: 2rem; line-height: 1.6;
-}
+/* 其他功能樣式 */
+.update-info { width: 100%; text-align: right; font-size: 0.75rem; color: #333; opacity: 0.8; font-weight: bold; margin-top: 2rem; }
+.note { background-color: rgba(224, 247, 250, 0.6); border-left: 6px solid #00bcd4; padding: 15px; border-radius: 0 12px 12px 0; font-weight: 600; font-size: 1.1rem; }
 
-@media (min-width: 768px) {
-    .skill-section { flex-direction: row; align-items: flex-start; }
-    .skill-info { width: 60%; }
-    .skill-screenshot { width: 40%; text-align: right; }
-}
-
+/* ==================================== */
+/* 5. 手機版適配 */
+/* ==================================== */
 @media (max-width: 768px) {
-    .main-container { padding: 1.5rem 1rem; border: none; }
-    .card-icon { width: 55%; }
-    .blur-card { padding: 2.5rem 1.5rem; }
-    .update-info { text-align: center; }
+    .main-container { padding: 1rem 1rem; border: none; }
+    h1 { font-size: 1.8rem !important; }
+    .card-icon { width: 70%; }
+    .blur-card { padding: 2rem 1.25rem; }
 }
