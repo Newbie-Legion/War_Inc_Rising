@@ -1,0 +1,111 @@
+/* ==================================== */
+/* 1. 核心底層與 PC 字體自動放大 */
+/* ==================================== */
+* { 
+    box-sizing: border-box; 
+    scroll-behavior: smooth; 
+}
+
+html, body {
+    margin: 0; padding: 0;
+    width: 100%; overflow-x: hidden;
+}
+
+body {
+    /* 🚀 修正：使用 clamp 讓字體在手機與 PC 之間彈性縮放 */
+    /* 最小 16px, 隨寬度增加, 最大在 PC 達到 19px */
+    font-size: clamp(16px, 1vw + 12px, 19px);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-image: url('../images/base_map.jpg');
+    background-size: cover; background-position: center bottom;
+    background-attachment: fixed; background-repeat: no-repeat;
+    background-color: #cbd5e1; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+}
+
+/* 🚀 針對大螢幕 PC 的進一步強化 */
+@media (min-width: 1200px) {
+    h1 { font-size: 3.5rem !important; }
+    h2 { font-size: 2.5rem !important; }
+    .text-content p { font-size: 1.25rem !important; line-height: 1.8; }
+    .main-container { max-width: 1050px; } /* 寬螢幕下稍微放寬容器 */
+}
+
+/* ==================================== */
+/* 2. 三明治層級系統 (Z-Index) */
+/* ==================================== */
+#windCanvas {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 15; pointer-events: none;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 3rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    min-height: 100vh;
+    position: relative;
+    z-index: 10;
+}
+
+/* ==================================== */
+/* 3. 進階霧面卡片系統 (極致柔和掃光) */
+/* ==================================== */
+.blur-card {
+    position: relative;
+    background: rgba(242, 242, 242, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 3rem 2rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.blur-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%; width: 120%; height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-20deg);
+    pointer-events: none; z-index: 25;
+    filter: blur(10px);
+}
+
+.blur-card.active::after {
+    animation: lightSweepDetailed 4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+}
+
+@keyframes lightSweepDetailed {
+    from { left: -150%; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    to { left: 350%; opacity: 0; }
+}
+
+/* 4. 動畫效果 */
+.reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+
+/* 5. 頁腳與其他 */
+.update-info { width: 100%; text-align: right; font-size: 0.8rem; color: #333; opacity: 0.8; font-weight: bold; margin-top: 2rem; line-height: 1.6; }
+
+@media (max-width: 768px) {
+    .main-container { padding: 1.5rem 1rem; border: none; }
+    .blur-card { padding: 2.5rem 1.5rem; }
+    .update-info { text-align: center; }
+}
