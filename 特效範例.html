@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>粒子背景與滾動進場特效</title>
+    <style>
+        /* 基礎網頁設定 */
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #eaeaea;
+            overflow-x: hidden;
+            /* 將原本的背景色拿掉，交給底層的 Canvas 畫布來繪製 */
+            background-color: transparent; 
+        }
+
+        /* --- 全螢幕粒子背景畫布 --- */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* 放在所有內容的最底層 */
+            pointer-events: none; /* 滑鼠可以直接穿透背景，不影響操作 */
+            /* 網頁整體的深色漸層底色 */
+            background: linear-gradient(135deg, #111115 0%, #1a1a24 100%);
+        }
+
+        /* 頂部引導區塊 */
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            /* 讓區塊背景透明，透出底下的粒子 */
+            background: transparent; 
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 40px;
+        }
+
+        .scroll-indicator {
+            font-size: 2rem;
+            color: #4dcad6;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        /* --- 卡片容器與進場特效設定 (與上一版相同) --- */
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 120px; 
+            padding: 100px 20px 150px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .presentation-card {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            /* 卡片加上一點半透明，讓粒子在背後飄動時隱約可見 */
+            background: rgba(37, 37, 45, 0.85);
+            backdrop-filter: blur(10px); /* 毛玻璃效果 */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            opacity: 0; 
+            transform: translateY(80px); 
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .presentation-card.show { opacity: 1; transform: translateY(0); }
+
+        /* 圖片區域與掃光 */
+        .image-box {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(145deg, rgba(50, 50, 62, 0.8), rgba(30, 30, 36, 0.8));
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .image-box img {
+            width: 100%; height: 100%; object-fit: contain;
+            opacity: 0; transform: scale(0.5) translateY(50px);
+        }
+
+        .presentation-card.show .image-box img {
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards;
+        }
+
+        .image-box::after {
+            content: ''; position: absolute; top: 0; left: -150%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg); pointer-events: none;
+        }
+
+        .presentation-card.show .image-box::after {
+            animation: lightSweep 1s ease-in-out 0.6s forwards;
+        }
+
+        /* 說明文字區塊 */
+        .text-box { flex: 1; }
+        .text-box h2, .text-box p, .text-box .tags { opacity: 0; transform: translateX(40px); }
+        .text-box h2 { font-size: 2.2rem; color: #4CAF50; margin: 0 0 15px 0; }
+        .text-box p { font-size: 1.1rem; line-height: 1.7; color: #cccccc; margin-bottom: 15px; }
+        .text-box .tags { margin-top: 25px; }
+        .tag {
+            display: inline-block; background: rgba(56, 56, 69, 0.8); color: #4dcad6;
+            padding: 6px 14px; border-radius: 6px; font-size: 0.9rem; margin-right: 10px; border-left: 3px solid #4dcad6;
+        }
+
+        .presentation-card.show .text-box h2 { animation: slideLeft 0.6s ease-out 0.4s forwards; }
+        .presentation-card.show .text-box p:nth-of-type(1) { animation: slideLeft 0.6s ease-out 0.5s forwards; }
+        .presentation-card.show .text-box p:nth-of-type(2) { animation: slideLeft 0.6s ease-out 0.6s forwards; }
+        .presentation-card.show .text-box .tags { animation: slideLeft 0.6s ease-out 0.8s forwards; }
+
+        @keyframes popIn {
+            0%   { opacity: 0; transform: scale(0.8) translateY(40px); }
+            60%  { opacity: 1; transform: scale(1.05) translateY(-10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes lightSweep {
+            0% { left: -100%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { left: 200%; opacity: 0; }
+        }
+        @keyframes slideLeft {
+            from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 768px) {
+            .presentation-card { flex-direction: column; padding: 30px 20px; }
+            .text-box h2, .text-box p, .text-box .tags { text-align: center; transform: translateY(30px); }
+            @keyframes slideLeft { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 背景粒子畫布 (固定在最底層) -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- 頂部滿版區塊 -->
+    <div class="hero-section">
+        <h1>進入方塊紀元</h1>
+        <p>請向下滑動，體驗迷人的粒子星火與動態載入效果</p>
+        <div class="scroll-indicator">↓</div>
+    </div>
+
+    <!-- 存放所有卡片的容器 -->
+    <div class="cards-container">
+        
+        <div class="presentation-card hidden">
+            <div class="image-box">
+                <img src="./image.png" alt="見習探險家">
+            </div>
+            <div class="text-box">
+                <h2>見習探險家 01</h2>
+                <p>注意到了嗎？背景有著如同魔法螢火蟲般的「方塊粒子」正在緩緩飄升，這是為了呼應 Voxel 體素風格特別設計的。</p>
+                <p>卡片本身還加上了輕微的「毛玻璃 (Backdrop-filter)」效果，當粒子從卡片背後飄過時，會有一種隱約透光的質感！</p>
+                <div class="tags">
+                    <span class="tag">背景粒子</span><span class="tag">毛玻璃</span><span class="tag">Voxel</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="presentation-card hidden">
+            <div class="image-box">
+                <img src="./image.png" alt="見習探險家">
+            </div>
+            <div class="text-box">
+                <h2>見習探險家 02</h2>
+                <p>背景的動態是由 HTML5 Canvas 所繪製，效能非常好。這讓網頁整體既有「全程的微動態生命力」，又不會搶走主角（圖片與文字）的風采。</p>
+                <p>繼續往下滾動觸發下一張卡片，享受錯落進場的視覺節奏。</p>
+                <div class="tags">
+                    <span class="tag">Canvas</span><span class="tag">高效能</span><span class="tag">氛圍營造</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="presentation-card hidden">
+            <div class="image-box">
+                <img src="./image.png" alt="見習探險家">
+            </div>
+            <div class="text-box">
+                <h2>見習探險家 03</h2>
+                <p>這種組合式特效（底層粒子循環播放 + 中層卡片滾動觸發 + 頂層元素錯落進場）是目前許多遊戲官網或新創產品頁面最愛用的手法。</p>
+                <p>它能讓一個簡單的單頁式網站看起來像是耗資不菲的互動專案！</p>
+                <div class="tags">
+                    <span class="tag">捲動特效</span><span class="tag">組合技</span><span class="tag">質感升級</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript 區域 -->
+    <script>
+        /* =========================================
+           1. 背景方塊粒子特效 (Canvas Particles)
+           ========================================= */
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray =[];
+
+        // 自動調整畫布大小符合視窗
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+
+        // 建立粒子物件的藍圖
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                // 為了配合 Voxel，粒子大小我們設定成有稜有角的小方塊
+                this.size = Math.random() * 3 + 1.5; 
+                this.speedX = Math.random() * 0.6 - 0.3; // 微微左右飄動
+                this.speedY = Math.random() * -1 - 0.2;  // 穩定往上飄 (負數)
+                
+                // 隨機分配兩種顏色：藍色(#4dcad6) 或 綠色(#4CAF50)，並帶有隨機透明度
+                const colors =['77, 202, 214', '76, 175, 80'];
+                const colorIndex = Math.floor(Math.random() * colors.length);
+                const opacity = Math.random() * 0.5 + 0.1;
+                this.color = `rgba(${colors[colorIndex]}, ${opacity})`;
+            }
+            
+            // 更新粒子位置
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // 如果粒子飄出頂部，就讓它從底部重新產生，達成無限循環
+                if (this.y < 0 - this.size) {
+                    this.y = canvas.height + this.size;
+                    this.x = Math.random() * canvas.width;
+                }
+                // 左右邊界處理
+                if (this.x > canvas.width + this.size) this.x = 0;
+                if (this.x < 0 - this.size) this.x = canvas.width;
+            }
+
+            // 畫出粒子 (使用 fillRect 畫方塊)
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        // 初始化產生 80 個粒子
+        function initParticles() {
+            particlesArray =[];
+            for (let i = 0; i < 80; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        // 粒子動畫迴圈
+        function animateParticles() {
+            // 每次重畫前清除畫布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            // 請求下一幀繼續播放
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+
+        /* =========================================
+           2. 滾動監聽進場特效 (Intersection Observer)
+           ========================================= */
+        const cards = document.querySelectorAll('.presentation-card');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.25 // 當卡片露出 25% 時觸發
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    observer.unobserve(entry.target); // 只觸發一次
+                }
+            });
+        }, observerOptions);
+
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+
+</body>
+</html>

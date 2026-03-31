@@ -4,10 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>War Inc Rising - 非官方資料站</title>
+    <!-- 使用 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .hero-section { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
+        .hero-section h1 { width: 100%; text-align: center; margin: 0 auto; }
+        .intro-text { line-height: 2.0 !important; letter-spacing: 0.02em; }
+
+        /* 公會清單：緊湊專業版 */
+        .guild-entry {
+            padding: 8px 20px; 
+            background: rgba(255, 255, 255, 0.15); 
+            border-radius: 10px;
+            border-left: 4px solid #004e92;
+            margin-bottom: 6px; 
+            font-weight: 800; 
+            color: #1e293b;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+        }
+        .guild-entry:hover { background: rgba(255, 255, 255, 0.35); transform: translateX(5px); }
+
+        /* 招募宣言特效框 */
+        .manifesto-box {
+            position: relative; padding: 25px 30px; margin: 35px 0;
+            background: rgba(0, 78, 146, 0.03); border-radius: 15px;
+            border-left: 6px solid #004e92;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            animation: manifestoPulse 4s ease-in-out infinite;
+        }
+        .manifesto-box p { margin: 0; color: #003366; font-weight: 800; font-size: 1.15rem; line-height: 1.8; }
+
+        @keyframes manifestoPulse {
+            0%, 100% { border-left-color: #004e92; background: rgba(0, 78, 146, 0.03); }
+            50% { border-left-color: #87bfff; background: rgba(0, 78, 146, 0.06); }
+        }
+    </style>
 </head>
 <body>
+    <!-- 背景粒子 -->
     <canvas id="windCanvas"></canvas>
 
     <main class="main-container">
@@ -15,32 +51,59 @@
             
             <!-- Hero 區塊 -->
             <div class="hero-section">
-                <img src="assets/images/War Inc Rising Logo.webp" alt="Logo" class="game-logo">
+                <img src="assets/images/War Inc Rising Logo.webp" alt="Logo" class="game-logo mx-auto animate-float">
                 <h1>歡迎來到 War Inc Rising <span class="not-official">非</span>官方資料站</h1>
             </div>
             
-            <hr class="my-4 border-t border-black/10">
+            <hr class="my-6 border-t border-black/10">
 
             <!-- 招募區塊 -->
-            <section class="blur-card mb-8 reveal">
-                <h2 class="text-2xl md:text-3xl font-bold text-blue-900 border-none mb-8 text-center">✨ [萌新軍本部] 招募</h2>
-                <div class="space-y-5 text-gray-900 leading-relaxed font-semibold text-lg md:text-xl text-left px-2 sm:px-6 mb-10">
-                    <p>我們是一群熱衷於 <strong>War Inc Rising</strong> 的中文玩家。透過 Discord，您可以獲得即時技術交流、戰術指導與夥伴合作樂趣！</p>
-                    <p>主公會徵求 <strong>5400</strong> 分以上玩家；另設分公會招收積極玩家。Discord 公開開放交流！</p>
+            <section class="blur-card mb-10 reveal">
+                <h2 class="text-3xl font-black text-blue-900 border-none mb-10 text-center">✨ [萌新軍本部] 招募中</h2>
+                
+                <div class="space-y-6 text-gray-900 leading-relaxed font-semibold text-lg md:text-xl text-left px-2 sm:px-6">
+                    <p class="intro-text">
+                        我們是一群熱衷於<strong>《War Inc Rising》</strong>的中文玩家社群，致力於打造一個兼具實力與交流的遊戲環境。透過 <strong>Discord</strong>，你可以隨時參與即時技術交流、戰術討論，並與夥伴並肩作戰，享受合作與成長的樂趣。
+                    </p>
+                    
+                    <div class="py-2">
+                        <h3 class="text-blue-800 font-black text-2xl mb-4 flex items-center">
+                            <span class="mr-2">🌟</span> 公會體系介紹
+                        </h3>
+                        <div class="space-y-1">
+                            <div class="guild-entry">🏆 萌新軍本部 ｜ 高戰力 × 高活躍菁英團</div>
+                            <div class="guild-entry">🌙 新月軍新月 ｜ 高活躍玩家（需加入 Discord）</div>
+                            <div class="guild-entry">⚔️ 萌新軍破曉 ｜ 活躍玩家首選據點</div>
+                            <div class="guild-entry">🔥 萌新軍星火 ｜ 半養老 × 公會戰並行</div>
+                            <div class="guild-entry">🌿 萌新小鎮 ｜ 輕鬆養老，休閒遊玩</div>
+                        </div>
+                    </div>
+
+                    <div class="manifesto-box">
+                        <p>
+                            本公會現正積極招募高度活躍、願意參與公會戰的玩家，我們重視的是上線率、參與度與團隊配合，而不是分數或是否課金，只要你夠活躍、願意一起投入戰鬥與成長，無論是否課金，在這裡都一定有你的位置。
+                        </p>
+                    </div>
                 </div>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="guides/guild_application.html" class="bg-blue-700 text-white px-6 py-3 rounded-xl text-center font-bold shadow-md hover:bg-blue-800 transition-all text-lg">🌐 公會申請教學 (附圖)</a>
-                    <a href="https://discord.gg/UKgG3CxsZD" target="_blank" class="bg-emerald-700 text-white px-6 py-3 rounded-xl text-center font-bold shadow-md hover:bg-emerald-800 transition-all text-lg">💬 加入 Discord 討論區</a>
+
+                <!-- 🚀 關鍵修改：mt-14 增加間距，空出一行 -->
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mt-14">
+                    <a href="guides/guild_application.html" class="bg-blue-700 text-white px-8 py-4 rounded-xl text-center font-bold shadow-lg hover:bg-blue-800 transition-all text-lg">
+                        🌐 公會申請教學 (附圖)
+                    </a>
+                    <a href="https://discord.gg/UKgG3CxsZD" target="_blank" class="bg-emerald-700 text-white px-8 py-4 rounded-xl text-center font-bold shadow-lg hover:bg-emerald-800 transition-all text-lg">
+                        💬 加入 Discord 討論區
+                    </a>
                 </div>
             </section>
 
-            <!-- 🚀 導覽區域：PC 2欄 / 手機 1欄 -->
-            <div class="h-6 w-full"></div> 
+            <!-- 導覽區域 -->
+            <div class="h-8 w-full"></div>
             <section class="reveal">
-                <h2 class="text-xl md:text-2xl font-bold text-blue-900 mb-2 ml-2">🚀 導覽</h2>
-                <p class="text-gray-800 ml-2 mb-8 font-bold text-lg opacity-90">點擊下方卡片，快速進入您感興趣的資料頁面。</p>
+                <h2 class="text-2xl font-bold text-blue-900 mb-2 ml-2">🚀 快速導覽</h2>
+                <p class="text-gray-800 ml-2 mb-10 font-bold text-lg opacity-80">點擊下方卡片，查看詳細遊戲資料。</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <a href="buildings/building_list.html" class="blur-card reveal delay-1">
                         <div class="icon-wrapper"><img src="assets/images/icon_building.png" alt="建築" class="card-icon"></div>
                         <div class="text-content"><h3>建築</h3><p>建築物基本介紹</p></div>
@@ -60,6 +123,7 @@
                 </div>
             </section> 
 
+            <div class="h-20"></div>
             <footer class="update-info">
                 © 版權所有，請勿盜用 | 內容更新：2026/01/04
             </footer>
@@ -67,7 +131,6 @@
     </main>
 
     <script>
-        /* 粒子與捲動偵測腳本維持不變，已優化觸發門檻 */
         const canvas = document.getElementById('windCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
