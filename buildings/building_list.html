@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Inc Rising - 建築總覽</title>
+    <!-- 使用 Tailwind CSS 處理佈局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* 🚀 頁面特定修正 */
+        .breadcrumb { font-weight: 600; color: #004e92; margin-bottom: 2rem; font-size: 1.1rem; }
+        .breadcrumb a { text-decoration: none; color: #444; transition: color 0.2s; }
+        .breadcrumb a:hover { color: #004e92; }
+
+        /* 🚀 建築頁面專屬佈局：PC 並排，手機堆疊 */
+        .detail-flex {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* 🚀 關鍵修改：建築圖片樣式統一化 (與士兵圖鑑一致) */
+        .building-img-wrapper {
+            flex-shrink: 0;
+            width: 320px; /* PC 版鎖定寬度 */
+            position: relative;
+        }
+
+        .building-display-img {
+            width: 100%;
+            height: auto;
+            /* 🚀 圓弧效果：1rem (16px) */
+            border-radius: 1.25rem; 
+            /* 🚀 精緻邊框：與士兵圖鑑一致 */
+            border: 4px solid rgba(255, 255, 255, 0.6);
+            /* 🚀 立體投影 */
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
+            transition: transform 0.3s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .detail-flex {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+            .building-img-wrapper {
+                width: 100%;
+                max-width: 280px; /* 手機版略縮小 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 🚀 背景粒子 -->
+    <canvas id="windCanvas"></canvas>
+
+    <main class="main-container">
+        <div class="relative z-20 w-full flex flex-col">
+            
+            <nav class="breadcrumb">
+                <a href="../index.html">🏠 首頁</a> <span class="mx-2 text-gray-400">/</span> 建築
+            </nav>
+
+            <div class="hero-section">
+                <h1 class="text-4xl font-bold mb-4 text-blue-900 text-center">🏗️ 建築資料中心</h1>
+                <p class="text-gray-700 text-center font-medium opacity-80 mb-8">村莊發展的核心設施與資源建築詳解</p>
+            </div>
+            
+            <hr class="my-8 border-t border-black/10">
+
+            <div class="space-y-12">
+                
+                <!-- 🏯 指揮所 -->
+                <section class="blur-card reveal">
+                    <div class="detail-flex">
+                        <div class="icon-wrapper building-img-wrapper">
+                            <img src="images/command_post_detail.png" alt="指揮所" class="card-icon building-display-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">🏯 指揮所 (Command Post)</h2>
+                            <p>指揮所是村莊的核心建築。所有其他建築物的等級上限，皆取決於指揮所的等級。升級至 2 至 3 級相對簡單；但升級至 4 級需要 5 個不同的傳奇單位，升級至 5 級則需要 5 個不同的神話單位。</p>
+                            <div class="mt-4 p-4 bg-white/30 rounded-lg border-l-4 border-blue-500 text-gray-800 font-medium">
+                                💡 核心提示：它是整個發展的引擎，優先等級最高。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 🧪 法術魔鍋 -->
+                <section class="blur-card reveal delay-1">
+                    <div class="detail-flex">
+                        <div class="icon-wrapper building-img-wrapper">
+                            <img src="images/magic_cauldron_detail.png" alt="法術魔鍋" class="card-icon building-display-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">🧪 法術魔鍋 (Magic Cauldron)</h2>
+                            <p>法術魔鍋的主要功能是解鎖競技場法術，並擴大戰鬥攜帶與研製上限。其中，治癒術會在升級至 2 級時解鎖，火球術則會在升級至 4 級時解鎖。</p>
+                            <p>此外，從 2 級升級至 5 級的每個等級，都會使法術的單次戰鬥攜帶量增加 1 點，同時研製上限量增加 2 點。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 🍄 隨從營地 -->
+                <section class="blur-card reveal delay-2">
+                    <div class="detail-flex">
+                        <div class="icon-wrapper building-img-wrapper">
+                            <img src="images/minion_camp_detail.png" alt="隨從營地" class="card-icon building-display-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">🍄 隨從營地 (Minion Camp)</h2>
+                            <p>隨從營地目前因隨從系統尚未完全開放，升級優先度較低。建議在木頭資源充裕時再進行升級。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 🌲 生產建築 -->
+                <section class="blur-card reveal">
+                    <h2 class="text-2xl font-bold text-blue-900 border-none mt-0 mb-8 text-center">🌲 基礎資源建築</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="flex flex-col items-center">
+                            <div class="icon-wrapper" style="width: 220px;">
+                                <img src="images/lumber_yard_detail.png" alt="伐木場" class="card-icon building-display-img">
+                            </div>
+                            <div class="text-content text-center mt-4">
+                                <h3 class="text-xl font-bold text-blue-900">伐木場</h3>
+                                <p>建議僅在指揮所要求時再提升等級。</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="icon-wrapper" style="width: 220px;">
+                                <img src="images/gold_mine_detail.png" alt="金礦" class="card-icon building-display-img">
+                            </div>
+                            <div class="text-content text-center mt-4">
+                                <h3 class="text-xl font-bold text-blue-900">金礦</h3>
+                                <p>建議僅在指揮所要求時再提升等級。</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ⚙️ 採集廠 -->
+                <section class="blur-card reveal">
+                    <h2 class="text-2xl font-bold text-blue-900 border-none mt-0 mb-8 text-center">⚙️ 新版本採集建築</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="flex flex-col items-center">
+                            <div class="icon-wrapper" style="max-width: 200px;">
+                                <img src="images/wood_collector_detail.jpg" alt="木頭採集廠" class="card-icon building-display-img">
+                            </div>
+                            <div class="text-content text-center mt-4">
+                                <h3 class="text-lg font-bold text-gray-900">木頭採集廠</h3>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="icon-wrapper" style="max-width: 200px;">
+                                <img src="images/stone_collector_detail.jpg" alt="石頭採集廠" class="card-icon building-display-img">
+                            </div>
+                            <div class="text-content text-center mt-4">
+                                <h3 class="text-lg font-bold text-gray-900">石頭採集廠</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-content text-center mt-8">
+                        <p>此為遊戲最新開放的資源建築類型。目前相關的升級數據、資源效率與機制仍在持續研究與收集中。</p>
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="h-20 w-full"></div>
+
+            <footer class="update-info">
+                © 萌新軍本部 製作<br>
+                內容更新時間：2026/01/04
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        /* 風之粒子與捲動腳本與首頁完全一致 */
+        const canvas = document.getElementById('windCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Wind {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.length = Math.random() * 80 + 40; this.thickness = Math.random() * 1.2 + 0.5;
+                this.speed = Math.random() * 0.8 + 0.4; this.opacity = Math.random() * 0.3 + 0.15;
+            }
+            update() { this.x += this.speed; this.y += Math.sin(this.x / 150) * 0.3; if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; } }
+            draw() {
+                ctx.beginPath(); const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0)'); grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`);
+                ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round';
+                ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke();
+            }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        window.addEventListener('resize', () => { initCanvas(); particles=[]; for(let i=0; i<35; i++) particles.push(new Wind()); });
+        initCanvas(); for(let i=0; i<35; i++) particles.push(new Wind()); animate();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
