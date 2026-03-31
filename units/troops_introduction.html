@@ -52,14 +52,56 @@
 
         .rarity-section-title { padding-left: 1rem; margin-top: 5rem; margin-bottom: 2rem; border-left: 6px solid #ccc; }
 
+        /* 🚀 鎖定底端的回到頂部按鈕樣式 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 78, 146, 0.2);
+            border-radius: 50%;
+            color: #004e92;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .back-to-top:hover {
+            background: #004e92;
+            color: white;
+            transform: scale(1.1) translateY(-5px);
+        }
+
         @media (max-width: 768px) {
             .unit-flex { flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
             .unit-img-wrapper { width: 140px; }
+            .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
         }
     </style>
 </head>
 <body>
+    <!-- 🚀 背景粒子 -->
     <canvas id="windCanvas"></canvas>
+
+    <!-- 🚀 回到頂端按鈕 -->
+    <div id="btnBackToTop" class="back-to-top" title="回到頂部">
+        ▲
+    </div>
 
     <main class="main-container">
         <div class="relative z-20 w-full flex flex-col">
@@ -103,7 +145,7 @@
                             <h3 class="text-2xl font-bold text-blue-900">騎士之王</h3>
                             <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、承受傷害</p>
                             <div class="mt-4 text-gray-800 leading-relaxed font-medium">
-                                平民專屬的優秀坦克，擁有極高的生命值和高防禦。其技能採用「物理」充能模式，不受屬性克制影響。與焰火劍客並列為當前版本推薦坦克首選。
+                                平民專屬的優秀坦克，騎士之王擁有極高的生命值和高防禦，是專注於戰線維持的堅實肉盾。其技能採用攻擊充能模式，且屬性為「物理」，不受任何屬性克制。由於其出色的高防禦特性，使其與「焰火劍客」並列為平民坦克首選。
                             </div>
                         </div>
                     </div>
@@ -1007,6 +1049,9 @@
         </div>
     </main>
 
+    <!-- 🚀回到頂端按鈕 -->
+    <div id="btnBackToTop" class="back-to-top" title="回到頂部">▲</div>
+
     <script>
         const canvas = document.getElementById('windCanvas');
         const ctx = canvas.getContext('2d');
@@ -1053,6 +1098,19 @@
                 });
             }, { threshold: 0.1 });
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            
+            // 🚀 回到頂端邏輯
+            const btt = document.getElementById('btnBackToTop');
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 400) {
+                    btt.classList.add('visible');
+                } else {
+                    btt.classList.remove('visible');
+                }
+            });
+            btt.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
         });
     </script>
 </body>
