@@ -3,36 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>War Inc Rising - 非官方資料站</title>
+    <title>War Inc Rising - Unofficial Wiki</title>
     <!-- 使用 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
+    <!-- 🚀 載入首頁數據檔案 -->
+    <script src="index_data.js"></script>
     <style>
+        /* 🚀 語言切換選單樣式 */
+        .lang-switcher { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+        .lang-select { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 2px solid #004e92; color: #004e92; padding: 8px 15px; border-radius: 50px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+
         .hero-section { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
         .hero-section h1 { width: 100%; text-align: center; margin: 0 auto; }
         .intro-text { line-height: 2.0 !important; letter-spacing: 0.02em; }
 
-        /* 公會清單：緊湊專業版 */
         .guild-entry {
-            padding: 8px 20px; 
-            background: rgba(255, 255, 255, 0.15); 
-            border-radius: 10px;
-            border-left: 4px solid #004e92;
-            margin-bottom: 6px; 
-            font-weight: 800; 
-            color: #1e293b;
-            transition: all 0.2s ease;
-            font-size: 1.1rem;
+            padding: 8px 20px; background: rgba(255, 255, 255, 0.15); border-radius: 10px;
+            border-left: 4px solid #004e92; margin-bottom: 6px; font-weight: 800; color: #1e293b; transition: all 0.2s ease; font-size: 1.1rem;
         }
         .guild-entry:hover { background: rgba(255, 255, 255, 0.35); transform: translateX(5px); }
 
-        /* 招募宣言特效框 */
         .manifesto-box {
-            position: relative; padding: 25px 30px; margin: 35px 0;
-            background: rgba(0, 78, 146, 0.03); border-radius: 15px;
-            border-left: 6px solid #004e92;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-            animation: manifestoPulse 4s ease-in-out infinite;
+            position: relative; padding: 25px 30px; margin: 35px 0; background: rgba(0, 78, 146, 0.03); border-radius: 15px; border-left: 6px solid #004e92; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02); animation: manifestoPulse 4s ease-in-out infinite;
         }
         .manifesto-box p { margin: 0; color: #003366; font-weight: 800; font-size: 1.15rem; line-height: 1.8; }
 
@@ -41,31 +34,24 @@
             50% { border-left-color: #87bfff; background: rgba(0, 78, 146, 0.06); }
         }
 
-        /* 🚀 鎖定底端的回到頂部按鈕樣式 */
-        .back-to-top {
-            position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(0, 78, 146, 0.2);
-            border-radius: 50%; color: #004e92; font-size: 1.2rem;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 1000; opacity: 0; visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-        .back-to-top:hover { background: #004e92; color: white; transform: scale(1.1) translateY(-5px); }
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 50%; color: #004e92; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.4s; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
 
-        @media (max-width: 768px) {
-            .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
-        }
+        @media (max-width: 768px) { .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; } .lang-switcher { top: 10px; right: 10px; } }
     </style>
 </head>
 <body>
-    <!-- 背景粒子 -->
     <canvas id="windCanvas"></canvas>
 
-    <!-- 🚀 回到頂端按鈕 -->
-    <div id="btnBackToTop" class="back-to-top" title="回到頂部">▲</div>
+    <!-- 🚀 語言切換選單 -->
+    <div class="lang-switcher">
+        <select id="langSelect" class="lang-select">
+            <option value="zh">繁體中文</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+
+    <div id="btnBackToTop" class="back-to-top">▲</div>
 
     <main class="main-container">
         <div class="relative z-20 w-full flex flex-col">
@@ -73,125 +59,142 @@
             <!-- Hero 區塊 -->
             <div class="hero-section">
                 <img src="assets/images/War Inc Rising Logo.webp" alt="Logo" class="game-logo mx-auto animate-float">
-                <h1>歡迎來到 War Inc Rising <span class="not-official">非</span>官方資料站</h1>
+                <h1 id="ui-hero-title">歡迎來到 War Inc Rising 非官方資料站</h1>
             </div>
             
             <hr class="my-6 border-t border-black/10">
 
             <!-- 招募區塊 -->
             <section class="blur-card mb-10 reveal">
-                <h2 class="text-3xl font-black text-blue-900 border-none mb-10 text-center">✨ [萌新軍本部] 招募中</h2>
+                <h2 class="text-3xl font-black text-blue-900 border-none mb-10 text-center" id="ui-recruit-title">✨ [萌新軍本部] 招募中</h2>
                 
                 <div class="space-y-6 text-gray-900 leading-relaxed font-semibold text-lg md:text-xl text-left px-2 sm:px-6">
-                    <p class="intro-text">
-                        我們是一群熱衷於<strong>《War Inc Rising》</strong>的中文玩家社群，致力於打造一個兼具實力與交流的遊戲環境。透過 <strong>Discord</strong>，你可以隨時參與即時技術交流、戰術討論，並與夥伴並肩作戰，享受合作與成長的樂趣。
-                    </p>
+                    <p class="intro-text" id="ui-recruit-intro"></p>
                     
                     <div class="py-2">
-                        <h3 class="text-blue-800 font-black text-2xl mb-4 flex items-center">
-                            <span class="mr-2">🌟</span> 公會體系介紹
-                        </h3>
-                        <div class="space-y-1">
-                            <div class="guild-entry">🏆 萌新軍本部 ｜ 高戰力   × 高活躍（需加入 Discord）</div>
-                            <div class="guild-entry">🌙 新月軍新月 ｜ 中戰力   × 高活躍（需加入 Discord）</div>
-                            <div class="guild-entry">⚔️ 萌新軍破曉 ｜ 戰力不拘 × 高活躍（需加入 Discord） </div>
-                            <div class="guild-entry">🔥 萌新軍星火 ｜ 半養老   × 無公會戰</div>
-                            <div class="guild-entry">🌿 萌新小鎮   ｜ 輕鬆養老，休閒遊玩 × 無公會戰</div>
+                        <h3 class="text-blue-800 font-black text-2xl mb-4 flex items-center" id="ui-guild-list-title">🌟 公會體系介紹</h3>
+                        <div id="guild-list-container" class="space-y-1">
+                            <!-- JS 動態生成 -->
                         </div>
                     </div>
 
                     <div class="manifesto-box">
-                        <p>
-                            萌新公會現正積極招募高度活躍、願意參與公會活動的玩家，我們重視的是上線率、參與度與團隊配合，而不是分數或是否課金，只要你夠活躍、願意一起投入戰鬥與成長，無論是否課金，在這裡都一定有你的位置。
-                        </p>
+                        <p id="ui-manifesto"></p>
                     </div>
                 </div>
 
                 <div class="flex flex-col sm:flex-row justify-center gap-4 mt-14">
-                    <a href="guides/guild_application.html" class="bg-blue-700 text-white px-8 py-4 rounded-xl text-center font-bold shadow-lg hover:bg-blue-800 transition-all text-lg">
-                        🌐 公會申請教學 (附圖)
-                    </a>
-                    <a href="https://discord.gg/UKgG3CxsZD" target="_blank" class="bg-emerald-700 text-white px-8 py-4 rounded-xl text-center font-bold shadow-lg hover:bg-emerald-800 transition-all text-lg">
-                        💬 加入 Discord 討論區
-                    </a>
+                    <a href="guides/guild_application.html" class="bg-blue-700 text-white px-8 py-4 rounded-xl text-center font-bold shadow-lg hover:bg-blue-800 transition-all text-lg" id="ui-btn-apply"></a>
+                    <a href="https://discord.gg/UKgG3CxsZD" target="_blank" class="bg-emerald-700 text-white px-8 py-4 rounded-xl text-center font-bold shadow-lg hover:bg-emerald-800 transition-all text-lg" id="ui-btn-discord"></a>
                 </div>
             </section>
 
             <!-- 導覽區域 -->
             <div class="h-8 w-full"></div>
             <section class="reveal">
-                <h2 class="text-2xl font-bold text-blue-900 mb-2 ml-2">🚀 快速導覽</h2>
-                <p class="text-gray-800 ml-2 mb-10 font-bold text-lg opacity-80">點擊下方卡片，查看詳細遊戲資料。</p>
+                <h2 class="text-2xl font-bold text-blue-900 mb-2 ml-2" id="ui-nav-title">🚀 快速導覽</h2>
+                <p class="text-gray-800 ml-2 mb-10 font-bold text-lg opacity-80" id="ui-nav-subtitle"></p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <a href="buildings/building_list.html" class="blur-card reveal delay-1">
-                        <div class="icon-wrapper"><img src="assets/images/icon_building.png" alt="建築" class="card-icon"></div>
-                        <div class="text-content"><h3>建築</h3><p>建築物基本介紹</p></div>
+                        <div class="icon-wrapper"><img src="assets/images/icon_building.png" class="card-icon"></div>
+                        <div class="text-content text-center"><h3 id="ui-card-building-t"></h3><p id="ui-card-building-d"></p></div>
                     </a>
                     <a href="units/troops_introduction.html" class="blur-card reveal delay-2">
-                        <div class="icon-wrapper"><img src="assets/images/icon_soldier.png" alt="士兵" class="card-icon"></div>
-                        <div class="text-content"><h3>士兵介紹</h3><p>單位基本介紹</p></div>
+                        <div class="icon-wrapper"><img src="assets/images/icon_soldier.png" class="card-icon"></div>
+                        <div class="text-content text-center"><h3 id="ui-card-unit-t"></h3><p id="ui-card-unit-d"></p></div>
                     </a>
                     <a href="modes/modes_list.html" class="blur-card reveal delay-1">
-                        <div class="icon-wrapper"><img src="assets/images/icon_mode.png" alt="模式" class="card-icon"></div>
-                        <div class="text-content"><h3>遊戲模式</h3><p>模式基本介紹</p></div>
+                        <div class="icon-wrapper"><img src="assets/images/icon_mode.png" class="card-icon"></div>
+                        <div class="text-content text-center"><h3 id="ui-card-mode-t"></h3><p id="ui-card-mode-d"></p></div>
                     </a>
                     <a href="tutorials/tutorial_main.html" class="blur-card reveal delay-2">
-                        <div class="icon-wrapper"><img src="assets/images/icon_guide.png" alt="攻略" class="card-icon"></div>
-                        <div class="text-content"><h3>綜合攻略</h3><p>持續更新中</p></div>
+                        <div class="icon-wrapper"><img src="assets/images/icon_guide.png" class="card-icon"></div>
+                        <div class="text-content text-center"><h3 id="ui-card-guide-t"></h3><p id="ui-card-guide-d"></p></div>
                     </a>
                 </div>
             </section> 
 
             <div class="h-20"></div>
-            <footer class="update-info">
-                © 版權所有，請勿盜用 | 內容更新：2026/04/02            </footer>
+            <footer class="update-info" id="ui-footer"></footer>
         </div>
     </main>
 
     <script>
+        // 🚀 多語言渲染邏輯
+        let currentLang = localStorage.getItem('prefLang') || 'zh';
+
+        function renderIndex() {
+            const data = INDEX_DATABASE.ui[currentLang];
+            const guilds = INDEX_DATABASE.guilds;
+
+            // 翻譯 UI 文字
+            document.getElementById('ui-hero-title').innerHTML = data.hero_title;
+            document.getElementById('ui-recruit-title').innerText = data.recruit_title;
+            document.getElementById('ui-recruit-intro').innerHTML = data.recruit_intro;
+            document.getElementById('ui-guild-list-title').innerText = data.guild_list_title;
+            document.getElementById('ui-manifesto').innerText = data.manifesto;
+            document.getElementById('ui-btn-apply').innerText = data.btn_apply;
+            document.getElementById('ui-btn-discord').innerText = data.btn_discord;
+            document.getElementById('ui-nav-title').innerText = data.nav_title;
+            document.getElementById('ui-nav-subtitle').innerText = data.nav_subtitle;
+            document.getElementById('ui-card-building-t').innerText = data.card_building_t;
+            document.getElementById('ui-card-building-d').innerText = data.card_building_d;
+            document.getElementById('ui-card-unit-t').innerText = data.card_unit_t;
+            document.getElementById('ui-card-unit-d').innerText = data.card_unit_d;
+            document.getElementById('ui-card-mode-t').innerText = data.card_mode_t;
+            document.getElementById('ui-card-mode-d').innerText = data.card_mode_d;
+            document.getElementById('ui-card-guide-t').innerText = data.card_guide_t;
+            document.getElementById('ui-card-guide-d').innerText = data.card_guide_d;
+            document.getElementById('btnBackToTop').innerText = data.back_to_top;
+            document.getElementById('ui-footer').innerText = data.update_info;
+
+            // 渲染公會清單
+            const listContainer = document.getElementById('guild-list-container');
+            listContainer.innerHTML = '';
+            guilds.forEach(guild => {
+                const div = document.createElement('div');
+                div.className = 'guild-entry';
+                div.innerText = guild[currentLang];
+                listContainer.appendChild(div);
+            });
+
+            // 重新觸發動畫
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.05 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // 切換器監聽
+        document.getElementById('langSelect').addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            localStorage.setItem('prefLang', currentLang);
+            renderIndex();
+        });
+
+        // 初始化
+        document.getElementById('langSelect').value = currentLang;
+        renderIndex();
+
+        // 回到頂端與粒子腳本 (保持不變)
         const canvas = document.getElementById('windCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
         function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         class Wind {
             constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-                this.length = Math.random() * 80 + 40; this.thickness = Math.random() * 1.2 + 0.5;
-                this.speed = Math.random() * 0.8 + 0.4; this.opacity = Math.random() * 0.3 + 0.15;
-            }
+            reset() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.length = Math.random() * 80 + 40; this.thickness = Math.random() * 1.2 + 0.5; this.speed = Math.random() * 0.8 + 0.4; this.opacity = Math.random() * 0.3 + 0.15; }
             update() { this.x += this.speed; this.y += Math.sin(this.x / 150) * 0.3; if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; } }
-            draw() {
-                ctx.beginPath(); const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y);
-                grad.addColorStop(0, 'rgba(255, 255, 255, 0)'); grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`);
-                ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round';
-                ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke();
-            }
+            draw() { ctx.beginPath(); const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y); grad.addColorStop(0, 'rgba(255, 255, 255, 0)'); grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`); ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round'; ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke(); }
         }
         function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
         window.addEventListener('resize', () => { initCanvas(); particles=[]; for(let i=0; i<35; i++) particles.push(new Wind()); });
         initCanvas(); for(let i=0; i<35; i++) particles.push(new Wind()); animate();
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
-            }, { threshold: 0.05 });
-            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-            // 🚀 回到頂端按鈕邏輯
-            const btt = document.getElementById('btnBackToTop');
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > 400) {
-                    btt.classList.add('visible');
-                } else {
-                    btt.classList.remove('visible');
-                }
-            });
-            btt.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        });
+        const btt = document.getElementById('btnBackToTop');
+        window.addEventListener('scroll', () => { if (window.pageYOffset > 400) btt.classList.add('visible'); else btt.classList.remove('visible'); });
+        btt.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     </script>
 </body>
 </html>
