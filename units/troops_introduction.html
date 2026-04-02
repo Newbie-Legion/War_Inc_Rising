@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Inc Rising - 士兵圖鑑 (完整版)</title>
+    <!-- 使用 Tailwind CSS 處理佈局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* 頁面特定修正 */
+        .breadcrumb { font-weight: 600; color: #004e92; margin-bottom: 2rem; font-size: 1.1rem; }
+        .breadcrumb a { text-decoration: none; color: #444; transition: color 0.2s; }
+        
+        /* 🚀 稀有度懸浮導覽列：確保手機一行顯示 */
+        .rarity-nav {
+            position: sticky; top: 15px; z-index: 100;
+            display: flex; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            justify-content: flex-start;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 10px 8px; border-radius: 1.25rem;
+            margin-bottom: 40px; border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); gap: 8px;
+        }
+        .rarity-nav::-webkit-scrollbar { display: none; }
+        .rarity-nav a {
+            text-decoration: none; font-weight: 800; font-size: 0.85rem;
+            padding: 6px 12px; border-radius: 10px; transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        @media (min-width: 768px) {
+            .rarity-nav { justify-content: space-around; padding: 12px; overflow-x: visible; gap: 0; }
+            .rarity-nav a { font-size: 1rem; padding: 6px 14px; }
+        }
+
+        .nav-mythic { color: #d4af37; border: 1px solid #d4af37; } .nav-mythic:hover { background: #d4af37; color: white; }
+        .nav-legendary { color: #ff4500; border: 1px solid #ff4500; } .nav-legendary:hover { background: #ff4500; color: white; }
+        .nav-epic { color: #9932cc; border: 1px solid #9932cc; } .nav-epic:hover { background: #9932cc; color: white; }
+        .nav-rare { color: #1e90ff; border: 1px solid #1e90ff; } .nav-rare:hover { background: #1e90ff; color: white; }
+        .nav-common { color: #3cb371; border: 1px solid #3cb371; } .nav-common:hover { background: #3cb371; color: white; }
+
+        /* 🚀 單位卡片排版：2:3 比例圖標 */
+        .unit-flex { display: flex; gap: 2.5rem; align-items: flex-start; width: 100%; }
+        .unit-img-wrapper { flex-shrink: 0; width: 180px; }
+        .unit-img {
+            width: 100%; height: auto; border-radius: 1rem;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+        }
+
+        .rarity-section-title { padding-left: 1rem; margin-top: 5rem; margin-bottom: 2rem; border-left: 6px solid #ccc; }
+
+        /* 🚀 鎖定底端的回到頂部按鈕樣式 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 78, 146, 0.2);
+            border-radius: 50%;
+            color: #004e92;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .back-to-top:hover {
+            background: #004e92;
+            color: white;
+            transform: scale(1.1) translateY(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .unit-flex { flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
+            .unit-img-wrapper { width: 140px; }
+            .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 🚀 背景粒子 -->
+    <canvas id="windCanvas"></canvas>
+
+    <!-- 🚀 回到頂端按鈕 -->
+    <div id="btnBackToTop" class="back-to-top" title="回到頂部">
+        ▲
+    </div>
+
+    <main class="main-container">
+        <div class="relative z-20 w-full flex flex-col">
+            
+            <nav class="breadcrumb">
+                <a href="../index.html">🏠 首頁</a> <span class="mx-2 text-gray-400">/</span> 士兵介紹
+            </nav>
+
+            <div class="hero-section">
+                <h1 class="text-4xl font-bold mb-4 text-blue-900 text-center">⚔️ 士兵介紹 - 作戰單位圖鑑</h1>
+                <p class="text-gray-700 text-center font-medium opacity-80 mb-8">
+                    單位圖鑑，內容按稀有度劃分，所有單位說明為筆者獨立整理，僅供新手參考。
+                </p>
+            </div>
+            
+            <!-- 🚀 懸浮導覽列 -->
+            <div class="rarity-nav reveal">
+                <a href="#mythic" class="nav-mythic">🌟 神話</a>
+                <a href="#legendary" class="nav-legendary">🔥 傳奇</a>
+                <a href="#epic" class="nav-epic">🟣 史詩</a>
+                <a href="#rare" class="nav-rare">💧 稀有</a>
+                <a href="#common" class="nav-common">🟢 普通</a>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- 🌟 神話區段 -->
+            <!-- ==================================== -->
+            <h2 id="mythic" class="rarity-section-title text-3xl font-bold text-yellow-600" style="border-color: #ffd700;">
+                🌟 神話單位 (Mythic)
+            </h2>
+
+            <h3 class="text-xl font-bold text-gray-700 mb-6 ml-2">【常駐召喚】</h3>
+            <div class="space-y-10">
+                <!-- 騎士之王 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/knight_king_icon.png" alt="騎士之王" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">騎士之王</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                日常即可取得，是平民玩家的首選坦克，擁有極高的生命值與防禦力；相較於焰火劍客，更擅長在 PVP 中穩定維持戰線。                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 焰火劍客 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/blaze_swordsman_icon.png" alt="焰火劍客" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">焰火劍客</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                日常即可取得，是平民玩家的首選坦克；其二技能具備機率回血效果，大幅提升續戰力。相較於騎士之王，更擅長應對 PVE 的長時間戰鬥，同時也是協作模式中的核心輸出之一。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 狂怒炮手 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/furious_artilleryman_icon.png" alt="狂怒炮手" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">狂怒炮手</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                基礎神話單位，設計相對落後，爆發不足且缺乏明確戰術價值。但日常即可取得，對無課玩家來說仍具備基本過渡價值。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 地脈術士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/earth_mage_icon.png" alt="地脈術士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">地脈術士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                玻璃大砲，開場需長達16秒充能，在PVP節奏中運氣成分高，設計相對落後，爆發不足且缺乏明確戰術價值。但日常即可取得，對無課玩家來說仍具備基本過渡價值。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 獅鷲騎士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/griffon_knight_icon.png" alt="獅鷲騎士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">獅鷲騎士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                定位副坦兼控制，技能採攻擊充能。因站位前排難以獲得攻速增益，導致釋放頻率偏低。建議放置於側翼提升戰場續航力，日常即可取得，對無課玩家來說仍具備基本過渡價值。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 風暴聖女 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/storm_maiden_icon.png" alt="風暴聖女" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">風暴聖女</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、範圍傷害、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                基礎神話單位，設計相對落後，爆發不足且缺乏明確戰術價值。但日常即可取得，對無課玩家來說仍具備基本過渡價值。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 星輝使徒 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/star_apostle_icon.png" alt="星輝使徒" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">星輝使徒</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、控制、增益</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                基礎神話單位，當角色達到 6 等時，其技能效果可彼此疊加（例如一隻 5 等與一隻 6 等，在重疊範圍內可累計 50% + 50%＝100% 的增益）。建議搭配水靈巫師作為輔助，可大幅提升戰場支援的覆蓋率與穩定性。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-700 mt-16 mb-6 ml-2">【限定召喚】</h3>
+            <div class="space-y-10">
+                <!-- 九尾妖狐 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/nine_tailed_fox_icon.png" alt="九尾妖狐" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-red-700">九尾妖狐</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、單體傷害、增益</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                曾是輸出型神話中單體傷害的天花板，憑藉時間充能機制確保技能循環穩定，在協作模式與狩獵魔花中長期佔據絕對主力地位；然而隨著亡骨槍手登場，低等級的九尾逐漸被其取代，地位明顯下滑。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 毒菇刺客 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/poison_assassin_icon.png" alt="毒菇刺客" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">毒菇刺客</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                技能可閃現至敵方法師身旁，造成高額傷害並附加沉默效果；雖然在 PVP 中出場率偏低，但在協作模式中地位無可取代，是核心輸出之一。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 叢林遊俠 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/jungle_ranger_icon.png" alt="叢林遊俠" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">叢林遊俠</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                曾是最泛用的輸出型神話之一，與旋律、水靈巫師相性極佳，長期擔任後排輸出的中流砥柱；然而隨著迷霧射手與亡骨槍手的出現，其定位逐漸被取代，整體存在價值明顯下滑。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 旋律編織者 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/melody_weaver_icon.png" alt="旋律編織者" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">旋律編織者</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、增益</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                百搭型核心輔助。提供大範圍攻速增益，6級後的常駐被動使其成為老玩家不可或缺的戰術選擇。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 水靈巫師 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/aqua_wizard_icon.png" alt="水靈巫師" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">水靈巫師</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、增益、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                具備大範圍充能支援能力；雖然在 PVP 中出場率不高，但在 PVE 場景中表現關鍵。無論是搭配冰雪提升傷害輸出、配合星輝強化攻擊增益，或結合戰爭女神發展護盾戰術，6 等水靈皆為不可或缺的核心支援。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-700 mt-16 mb-6 ml-2">【轉盤/特殊獲取】</h3>
+            <div class="space-y-10">
+                <!-- 蠻族暴君 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/barbarian_tyrant_icon.png" alt="蠻族暴君" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">蠻族暴君</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                技能可跳入敵方後排，進行嘲諷並吸引火力，同時提供防禦增益；在高等級條件下，暴君與高等血刃的搭配能展現出極具壓制力的戰術組合。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 迷霧射手 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/misty_archer_icon.png" alt="迷霧射手" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">迷霧射手</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                曾是版本答案之一，擁有高射速輸出，但極度依賴機率觸發技能；在運氣良好時可發揮近乎神級的戰力，兼具單體與群體輸出能力。儘管目前仍具強度，但隨著亡骨槍手登場，低等級的霧影逐漸被取代，整體地位下滑；不過在隊伍配置上，仍需配置複數 6 等迷霧射手，與亡骨槍手搭配以觸發其二技能效果。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 冰雪女王 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/ice_queen_icon.png" alt="冰雪女王" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">冰雪女王</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、範圍傷害、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                曾為版本答案之一；然而隨著光輝戰士登場並逐漸普及，單一或少量冰雪的傷害已不再足夠。但若對手光輝覆蓋率不足，或冰雪本身的等級與數量達標，仍有機會在開場造成可觀壓制。在無限活動中，冰雪搭配水靈亦能展現出亮眼的輸出表現。            
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 戰爭女神 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/war_goddess_icon.png" alt="戰爭女神" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">戰爭女神</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、增益</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                在 PVE 活動中堪稱版本答案，雙 6 等以上女神搭配 6 等水靈，幾乎適用於大多數關卡，大幅提升戰場生存能力，甚至可延長至時間結束仍未被擊潰；在 PVP 中，亦有高端玩家將其與血刃、光輝搭配，形成高強度的菜刀隊體系。                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 重砲先鋒 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/heavy_artillery_vanguard_icon.png" alt="重砲先鋒" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">重砲先鋒</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                自推出以來定位不明、實用性有限，整體作用不大，出場率極低，目前不建議投入資源培養。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 暗月女皇 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/dark_moon_empress_icon.png" alt="暗月女皇" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">暗月女皇</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                技能可有效限制敵方後排輸出，具備強大的戰局逆轉能力；然而其效果帶有較高隨機性。隨著後續改版，複數女皇不再會鎖定相同目標，使整體控制表現略有提升，戰場穩定性有所改善。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 烈焰主宰 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/flame_sovereign_icon.png" alt="烈焰主宰" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">烈焰主宰</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、範圍傷害、增益</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                6 等級技能可提供周圍一格的傷害增益，在 PVE 中具備極高價值；但於 PVP 場景下，技能常在開局即作用於坦克，導致效益受限，整體 PVP 實用性相對較低。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 潮汐領主 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/tidal_lord_icon.png" alt="潮汐領主" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">潮汐領主</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、控制、增益</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                6 等級技能可為周圍一格提供攻速增益，並具備鎖定後排的傷害特性，使其在 PVP 中擁有極高價值；然而在 PVE 場景下，整體實用性略遜於烈焰主宰。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 光輝戰士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/Radiant_Warrior_icon.png" alt="光輝戰士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">光輝戰士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、坦克</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                技能可在開局立即為周圍一格單位施放護盾，護盾值相當於目標最大生命值的 50%。其設計核心在於反制開局爆發型角色，為隊伍配置中極為關鍵的防禦單位；高端玩家通常至少會配置 4 隻以上以確保穩定性。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 木靈守衛 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/Wood_Spirit_Guard_icon.png" alt="木靈守衛" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">木靈守衛</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、治療</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                唯一具備治療能力的坦克角色，在 PVE 中表現極為出色；但於 PVP 快節奏環境下相對脆弱，需謹慎佈陣，避免過早成為集火目標。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 血刃 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/Red Blade_icon.png" alt="血刃" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">血刃</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                技能可在開局 6 秒內閃現至敵方射手或法師身旁，施放高額持續性傷害；搭配蠻族暴君與戰爭女神時，可組成特殊的近戰菜刀隊體系。不過，此角色需複數配置且達高等級，才具備足夠的威懾與擊殺能力，整體培養成本較高。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 亡骨槍手 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/Bone marksman_icon.png" alt="亡骨槍手" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">亡骨槍手</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                作為 v0.8.8 版本答案，擁有極高的前期成長曲線，可有效取代等級不足的輸出單位；同時為唯一在 4 等即可解鎖二技能的角色，堪稱中低課玩家的輸出首選。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 熾天使 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/Seraph_icon.png" alt="熾天使" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">熾天使</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                競技場前20名專屬神話。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 暗夜伯爵 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/mythic/Night scion_icon.png" alt="暗夜伯爵" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">暗夜伯爵</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                公會戰排名專屬神話。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- ==================================== -->
+            <!-- 🔥 傳奇區段 -->
+            <!-- ==================================== -->
+            <h2 id="legendary" class="rarity-section-title text-3xl font-bold text-orange-600" style="border-color: #ff4500;">
+                🔥 傳奇單位 (Legendary)
+            </h2>
+
+            <div class="space-y-10">
+                <!-- 櫻花浪人 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/legendary/cherry_ronin_icon.png" alt="櫻花浪人" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">櫻花浪人</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                作為傳奇階段中最堅實的前排之一，在神話坦克尚未成長完成前，是極佳的過渡與替代選擇。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 幽靈刺客 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/legendary/ghost_assassin_icon.png" alt="幽靈刺客" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">幽靈刺客</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                具備擾亂敵方節奏能力的高風險單位，可於開場閃現至敵方後排施壓；但需嚴格控制部署數量，否則容易因過度突進而淪為「送頭」。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 熊靈勇士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/legendary/bear_warrior_icon.png" alt="熊靈勇士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">熊靈勇士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                具備強力的爆發型群體傷害能力，是筆者認為傳奇單位中最值得優先升級至 7 等的角色。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 灰燼法師 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/legendary/ash_mage_icon.png" alt="灰燼法師" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">灰燼法師</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                純粹的範圍輸出單位，面板數值與風語者相近，但缺乏控制能力，整體實用性較低。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 風語者 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/legendary/wind_speaker_icon.png" alt="風語者" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">風語者</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、範圍傷害、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                               整體表現優於灰燼法師，技能具備聚怪效果，能有效集中敵人並最大化範圍傷害輸出；但由於後期存在更優選擇，出場率相對偏低。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 爆破矮人 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/legendary/explosion_dwarf_icon.png" alt="爆破矮人" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">爆破矮人</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                可視為弱化版狂怒炮手，整體表現平庸，不建議投入資源培養。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 御風統領 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/legendary/Windlord_icon.png" alt="御風統領" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">御風統領</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、單體傷害、削弱對手</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                單體風屬性輸出單位，在新手前期若單體傷害不足時可作為過渡補充；但隨著後期出現更優解，整體出場率相對偏低。
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 鐵壁者 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/legendary/Iron_Bulwark_icon.png" alt="鐵壁者" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">鐵壁者</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、承受傷害、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                技能在單位死亡後，會對隨機輔助單位施加傷害並降低攻速；若目標為【低攻速】屬性，則以該目標為中心再釋放中範圍廣域傷害並附帶攻速削減。隨著亡骨槍手推出，其實用性略有提升，但由於效果具隨機性，仍可能對戰局造成一定程度的不穩定影響。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- 🟣 史詩區段 -->
+            <!-- ==================================== -->
+            <h2 id="epic" class="rarity-section-title text-3xl font-bold text-purple-600" style="border-color: #9932cc;">
+                🟣 史詩單位 (Epic)
+            </h2>
+
+            <div class="space-y-10">
+                <!-- 岩石投擲者 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/rock_thrower_icon.png" alt="岩石投擲者" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">岩石投擲者</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、控制、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                在遊戲前中期表現極為優秀的過渡型坦克，但隨著神話坦克逐漸成長，其重要性也會隨之下降。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 火焰法師 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/flame_mage_icon.png" alt="火焰法師" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">火焰法師</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                專精於對單體單位造成強力輸出，雖然生存能力較低、容易陣亡，但在戰線穩定後可提供極為可觀的火力，主要應用於 PVE 場景。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 雪人戰士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/snowman_warrior_icon.png" alt="雪人戰士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">雪人戰士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                定位較為模糊，整體表現不夠突出，在實戰中多半會被選擇性忽略。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 毒藥大師 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/poison_master_icon.png" alt="毒藥大師" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">毒藥大師</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                在新手進行無限戰爭模式時為必備戰力，具備極高的戰術價值，強烈建議優先升級至 6 等。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 神諭者 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/oracle_icon.png" alt="神諭者" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">神諭者</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、增益</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                無論 PVP 或 PVE 皆為必備單位；雖然疊加次數上限已調整為 20 次，但仍是團隊輔助體系中的核心角色。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 皇家弓箭手 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/royal_archer_icon.png" alt="皇家弓箭手" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">皇家弓箭手</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                為轉盤／課金活動限定單位，具備長攻擊距離與後排站位優勢，使其生存率高於火焰法師；在 PVE 場景中具備極高的實戰價值。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 木頭巫師 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/wood_wizard_icon.png" alt="木頭巫師" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">木頭巫師</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、群體治療</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                作為治癒型單位的首選，後期 PVP 隊伍通常會配置至少一名 7 等級的木頭巫師；同時在 PVE 場景中亦具備良好的發揮空間。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 南瓜守衛 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/pumpkin_guard_icon.png" alt="南瓜守衛" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">南瓜守衛</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                作為櫻花浪人的優秀替代選擇，取得容易且升級快速，是過渡期極佳的前排替代角色。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 矮人狂戰士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/epic/dwarf_berserker_icon.png" alt="矮人狂戰士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">矮人狂戰士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害、增益</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                轉盤活動限定單位。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- ==================================== -->
+            <!-- 💧 稀有區段 -->
+            <!-- ==================================== -->
+            <h2 id="rare" class="rarity-section-title text-3xl font-bold text-blue-600" style="border-color: #1e90ff;">
+                💧 稀有單位 (Rare)
+            </h2>
+
+            <div class="space-y-10">
+                <!-- 重錘衛士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/heavy_sledgehammer_guard_icon.png" alt="重錘衛士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">重錘衛士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                低消耗的過渡型單位，在前中期可作為暫時替代，但進入中後期後，通常不再被納入主力隊伍。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 哥布林戰士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/goblin_warrior_icon.png" alt="哥布林戰士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">哥布林戰士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                低消耗的過渡型單位，在前中期可作為暫時替代，但進入中後期後，通常不再被納入主力隊伍。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 林地斥候 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/forest_scout_icon.png" alt="林地斥候" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">林地斥候</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                               低消耗的過渡型單位，在前中期可作為暫時替代，但進入中後期後，通常不再被納入主力隊伍；不過在稀有等級升級所需的鍛造石大幅降低後，8～9 等斥侯的強度已可取代低等級的火焰法師。                          </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 見習法師 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/apprentice_mage_icon.png" alt="見習法師" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">見習法師</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                低消耗的過渡型單位，在前中期可作為暫時替代，但進入中後期後，通常不再被納入主力隊伍。
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 狂戰士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/berserker_icon.png" alt="狂戰士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">狂戰士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                低消耗的過渡型單位，在前中期可作為暫時替代，但進入中後期後，通常不再被納入主力隊伍。
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 炸彈兵 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/bomber_icon.png" alt="炸彈兵" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">炸彈兵</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                作為炸彈隊戰術的核心單位之一，專精於 PVP 體系；但隨著光輝戰士的出現，其實用價值大幅下降，目前僅在低分段競技場中仍具一定發揮空間。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 哥布林薩滿 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/goblin_shaman_icon.png" alt="哥布林薩滿" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">哥布林薩滿</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：中排、治療</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                少數具備治癒能力的單位，但生存能力較低，容易被範圍攻擊秒殺，實戰中出場機會較少。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 哥布林大廚 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/goblin_chef_icon.png" alt="哥布林大廚" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">哥布林大廚</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、控制、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                在 4 水費單位中擁有最高的單體生命值，是一名稱職的副坦角色；多數情況下僅在剩餘 4 點水費時作為臨時補位使用。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 疾風狼 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/gale_wolf_icon.png" alt="疾風狼" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">疾風狼</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                技能觸發條件嚴苛，導致實戰表現不佳，在實際對戰中幾乎不會上場。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 神盾士兵 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/aegis_soldier_icon.png" alt="神盾士兵" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">神盾士兵</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                僅需 3 水費即可提供優秀防禦，性價比極高；同時隨著稀有等級升級所需的鍛造石大幅降低，8～9 等神盾士兵亦可作為補位選擇。此外，在 PVE 的無限活動中亦具備一定的戰術價值。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 冰霜骷髏 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/Frost Skeleton_icon.png" alt="冰霜骷髏" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">冰霜骷髏</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                              技能於死亡後，以自身為中心施放兩格範圍的廣域減速效果，通常用於側翼或後排突襲，開局即可主動犧牲，為亡骨槍手創造觸發二技能的條件與機會。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 加農戰車 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/rare/canon_chariot_icon.png" alt="加農戰車" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">加農戰車</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">尚未實裝</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- 🟢 普通區段 -->
+            <!-- ==================================== -->
+            <h2 id="common" class="rarity-section-title text-3xl font-bold text-green-600" style="border-color: #3cb371;">
+                🟢 普通單位 (Common)
+            </h2>
+
+            <div class="space-y-10">
+                <!-- 火槍手 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/common/flintlock_shooter_icon.png" alt="火槍手" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">火槍手</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                新手階段過渡單位。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 弓箭手 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/common/archer_icon.png" alt="弓箭手" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">弓箭手</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、單體傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                新手階段過渡單位。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 雪球投擲手 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/common/snowball_thrower_icon.png" alt="雪球投擲手" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">雪球投擲手</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：後排、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                新手階段過渡單位。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 劍士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/common/swordsman_icon.png" alt="劍士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">劍士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、範圍傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                新手階段過渡單位。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 炸彈客 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/common/bomber_icon.png" alt="炸彈客" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">炸彈客</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、控制</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                新手階段過渡單位。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 木盾衛士 -->
+                <section class="blur-card reveal">
+                    <div class="unit-flex">
+                        <div class="icon-wrapper unit-img-wrapper">
+                            <img src="images/common/wooden_shield_guard_icon.png" alt="木盾衛士" class="card-icon unit-img">
+                        </div>
+                        <div class="text-content text-left w-full">
+                            <h3 class="text-2xl font-bold text-blue-900">木盾衛士</h3>
+                            <p class="text-blue-600 font-bold text-lg mt-1">定位：前排、承受傷害</p>
+                            <div class="mt-4 text-gray-800 leading-relaxed font-medium">
+                                新手階段過渡單位。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="h-24 w-full"></div>
+
+            <footer class="update-info">
+                © 萌新軍本部 製作<br>
+                內容更新時間：2026/04/02            </footer>
+        </div>
+    </main>
+
+    <!-- 🚀回到頂端按鈕 -->
+    <div id="btnBackToTop" class="back-to-top" title="回到頂部">▲</div>
+
+    <script>
+        const canvas = document.getElementById('windCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Wind {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.length = Math.random() * 80 + 40;
+                this.thickness = Math.random() * 1.2 + 0.5;
+                this.speed = Math.random() * 0.8 + 0.4;
+                this.opacity = Math.random() * 0.3 + 0.15;
+            }
+            update() {
+                this.x += this.speed;
+                this.y += Math.sin(this.x / 150) * 0.3;
+                if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; }
+            }
+            draw() {
+                ctx.beginPath();
+                const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`);
+                ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round';
+                ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke();
+            }
+        }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        window.addEventListener('resize', () => { initCanvas(); particles=[]; for(let i=0; i<35; i++) particles.push(new Wind()); });
+        initCanvas(); for(let i=0; i<35; i++) particles.push(new Wind()); animate();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            
+            // 🚀 回到頂端邏輯
+            const btt = document.getElementById('btnBackToTop');
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 400) {
+                    btt.classList.add('visible');
+                } else {
+                    btt.classList.remove('visible');
+                }
+            });
+            btt.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
