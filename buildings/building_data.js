@@ -21,7 +21,7 @@ const BUILDING_DATABASE = {
       "base_resource_title": "🌲 Base Resource Buildings",
       "new_version_title": "⚙️ New Version Collectors",
       "back_to_top": "Top",
-      "footer": "Produced by Recruit Army HQ | Updated: 2026/04/02"
+      "footer": "Produced by Newbie Legion | Updated: 2026/04/02"
     }
   },
   "content": {
