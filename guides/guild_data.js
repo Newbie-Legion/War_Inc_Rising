@@ -17,7 +17,7 @@ const GUILD_APP_DATABASE = {
     },
     "en": {
       "title": "🔍️ Guild Application Guide - In-Game Steps",
-      "subtitle": "Thank you for considering joining the <strong>Recruit Army</strong>! Below is the detailed visual guide:",
+      "subtitle": "Thank you for considering joining the <strong>Newbie Legion</strong>! Below is the detailed visual guide:",
       "breadcrumb_home": "🏠 Home",
       "breadcrumb_current": "Application Guide",
       "step": "STEP",
@@ -25,7 +25,7 @@ const GUILD_APP_DATABASE = {
       "note_title": "⚠️ Important Note (Slot Coordination):",
       "note_content": "Due to limited guild slots and the unoptimized in-game recruitment system, we receive a high volume of applications. If the guild is full or your application is pending, we highly recommend joining our Discord. Applicants who are active in Discord discussions will be prioritized if they meet the requirements.",
       "back_to_top": "Top",
-      "footer": "Produced by Recruit Army HQ | Updated: 2026/04/02"
+      "footer": "Produced by Newbie Legion | Updated: 2026/04/02"
     }
   },
   "steps": [
