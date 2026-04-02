@@ -29,7 +29,7 @@ const UNIT_DATABASE = {
       "nav_common": "🟢 Common",
       "position_label": "Position: ",
       "back_to_top": "Top",
-      "update_info": "Produced by Recruit Army HQ | Last Updated: 2026/04/02"
+      "update_info": "Produced by Newbie Legion | Last Updated: 2026/04/02"
     }
   },
   "units": [
