@@ -22,7 +22,7 @@ const INDEX_DATABASE = {
     },
     "en": {
       "hero_title": "Welcome to War Inc Rising <span class='not-official'>Unofficial</span> Wiki",
-      "recruit_title": "✨ [Recruit HQ] Recruitment",
+      "recruit_title": "✨ [Newbie Legion] Recruitment",
       "recruit_intro": "We are a dedicated community of <strong>War Inc Rising</strong> players committed to building a competitive yet supportive environment. Through <strong>Discord</strong>, you can engage in real-time tactical discussions, share advanced techniques, and fight alongside comrades for mutual growth.",
       "guild_list_title": "🌟 Our Guild System",
       "manifesto": "The Recruit Guild is actively looking for highly active players who want to participate in guild activities. We prioritize online consistency, participation, and teamwork over high scores or spending. As long as you are active and willing to grow with us, there is a place for you here, regardless of your F2P/P2W status.",
@@ -39,10 +39,10 @@ const INDEX_DATABASE = {
     }
   },
   "guilds": [
-    { "zh": "🏆 萌新軍本部 ｜ 高戰力   × 高活躍（需加入 Discord）", "en": "🏆 Recruit HQ | High Power × High Activity (Discord Required)" },
-    { "zh": "🌙 新月軍新月 ｜ 中戰力   × 高活躍（需加入 Discord）", "en": "🌙 Crescent Moon | Mid Power × High Activity (Discord Required)" },
-    { "zh": "⚔️ 萌新軍破曉 ｜ 戰力不拘 × 高活躍（需加入 Discord）", "en": "⚔️ Recruit Dawn | All Power × High Activity (Discord Required)" },
-    { "zh": "🔥 萌新軍星火 ｜ 半養老   × 無公會戰", "en": "🔥 Recruit Spark | Semi-casual × No Guild War" },
-    { "zh": "🌿 萌新小鎮   ｜ 輕鬆養老，休閒遊玩 × 無公會戰", "en": "🌿 Recruit Town | Casual & Relaxed × No Guild War" }
+    { "zh": "🏆 萌新軍本部 ｜ 高戰力   × 高活躍（需加入 Discord）", "en": "🏆 萌新軍本部 | High Power × High Activity (Discord Required)" },
+    { "zh": "🌙 新月軍新月 ｜ 中戰力   × 高活躍（需加入 Discord）", "en": "🌙 新月軍新月 | Mid Power × High Activity (Discord Required)" },
+    { "zh": "⚔️ 萌新軍破曉 ｜ 戰力不拘 × 高活躍（需加入 Discord）", "en": "⚔️ 萌新軍破曉 | All Power × High Activity (Discord Required)" },
+    { "zh": "🔥 萌新軍星火 ｜ 半養老   × 無公會戰", "en": "🔥 萌新軍星火 | Semi-casual × No Guild War" },
+    { "zh": "🌿 萌新小鎮   ｜ 輕鬆養老，休閒遊玩 × 無公會戰", "en": "🌿 萌新小鎮 | Casual & Relaxed × No Guild War" }
   ]
 };
