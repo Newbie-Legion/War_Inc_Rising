@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Inc Rising - 遊戲模式全解析</title>
+    <!-- 使用 Tailwind CSS 處理佈局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* 🚀 頁面特定修正 */
+        .breadcrumb { font-weight: 600; color: #004e92; margin-bottom: 2rem; font-size: 1.1rem; }
+        .breadcrumb a { text-decoration: none; color: #444; transition: color 0.2s; }
+        .breadcrumb a:hover { color: #004e92; }
+
+        .mode-body h3 { font-size: 1.5rem; color: #004e92; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid rgba(0,78,146,0.1); padding-bottom: 5px; }
+        .mode-body p { margin-bottom: 1.2rem; line-height: 1.8; color: #333; font-weight: 500; }
+        
+        /* 表格排版優化 */
+        .stats-table-container { width: 100%; margin: 2rem 0; }
+        .stats-table table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            border-radius: 1.25rem; overflow: hidden; border: 1px solid rgba(0, 78, 146, 0.1);
+            background-color: rgba(255, 255, 255, 0.2); table-layout: fixed;
+        }
+        .stats-table th { 
+            background-color: rgba(100, 116, 139, 0.1) !important; color: #004e92 !important; 
+            width: 160px; text-align: center; padding: 15px; font-weight: 800;
+            border-right: 1px solid rgba(0, 78, 146, 0.1); border-bottom: 1px solid rgba(0, 78, 146, 0.05);
+        }
+        .stats-table td { 
+            width: auto; text-align: left; padding: 15px 25px; font-weight: 600; 
+            color: #444; border-bottom: 1px solid rgba(0, 78, 146, 0.05); line-height: 1.6;
+        }
+
+        /* 回到頂部按鈕 */
+        .back-to-top {
+            position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(0, 78, 146, 0.2);
+            border-radius: 50%; color: #004e92; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 1000; opacity: 0; visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-to-top:hover { background: #004e92; color: white; transform: scale(1.1) translateY(-5px); }
+
+        @media (max-width: 768px) {
+            .stats-table th { width: 100px; padding: 12px 10px; font-size: 0.9rem; }
+            .stats-table td { padding: 12px 15px; font-size: 0.9rem; }
+            .mode-body h3 { font-size: 1.3rem; }
+            .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 🚀 背景粒子 -->
+    <canvas id="windCanvas"></canvas>
+
+    <!-- 🚀 回到頂端按鈕 -->
+    <div id="btnBackToTop" class="back-to-top" title="回到頂部">▲</div>
+
+    <main class="main-container">
+        <div class="relative z-20 w-full flex flex-col mode-body">
+            
+            <nav class="breadcrumb">
+                <a href="../index.html">🏠 首頁</a> <span class="mx-2 text-gray-400">/</span> 遊戲模式
+            </nav>
+
+            <div class="hero-section">
+                <h1 class="text-4xl font-bold mb-4 text-blue-900 text-center">🕹️ 遊戲模式</h1>
+                <p class="text-gray-700 text-center font-medium opacity-80 mb-8">各類型 PVE 與 PVP 玩法機制與獎勵全解析</p>
+            </div>
+            
+            <hr class="my-8 border-t border-black/10">
+
+            <div class="space-y-12">
+                
+                <!-- 1. 協作模式 -->
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0 mb-6">🤝 協作模式</h2>
+                        <p>協作模式為遊戲內建的合作塔防玩法，直接套用玩家已培養的士兵等級，因此士兵等級是影響通關難度的關鍵因素。等級越高，不僅能大幅提升容錯率，也能有效提高挑戰更高波次的成功率。</p>
+                        
+                        <div class="stats-table-container">
+                            <div class="stats-table">
+                                <table>
+                                    <tbody>
+                                        <tr><th>對戰形式</th><td>塔防合作</td></tr>
+                                        <tr><th>目標</th><td>盡可能通關最高波次</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <h3>獨特機制</h3>
+                <p>模式中設有多種隨機機制，包括「轉盤」與「骰子大富翁」，兩種玩法會交替輪換；此外，還內建獨特的「天使／惡魔選擇系統」。若雙方玩家皆選擇正確選項，將可獲得額外的士兵單位。為確保收益最大化，建議在開局前先行協調選擇策略。</p>
+                        
+                        <h3>賽季與獎勵</h3>
+                        <p>通關不同難度等級皆可獲得對應獎勵。值得一提的是，此模式能提供大量木材資源，當指揮所升級面臨木材短缺時，是快速累積資源的有效途徑。</p>
+                    </div>
+                </section>
+
+                <!-- 2. 無限 -->
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0 mb-6">♾️ 無限</h2>
+                        <p>無限模式要求玩家建立穩固的陣型，以應對持續重生並不斷湧入的敵人。每個無限賽季為期 7 天，期間將依序登場 7 組不同類型的特定敵人，考驗玩家的應變與配置能力。</p>
+                        
+                        <div class="stats-table-container">
+                            <div class="stats-table">
+                                <table>
+                                    <tbody>
+                                        <tr><th>對戰形式</th><td>PVE</td></tr>
+                                        <tr><th>目標</th><td>盡可能殺傷敵人</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3>分組與獎勵</h3>
+                        <p></p>
+                        <p>隨著隊伍累積總傷害提升，玩家將由第 1 小組逐步晉升至第 9 小組，對應的每日排名獎勵也會隨之提高。此模式最核心的獎勵為「鍛造石」，為現階段極為稀有的重要資源，士兵升至 7 等以上皆需仰賴其支撐。當成功進入高等小組後，每日累積總傷害達到 5.6M 與 14M 時，可額外獲得 50 與 100 鍛造石；同時依據每日排名不同，亦可獲得對應數量的鑽石，對中小課玩家而言是不小的收益。</p>
+                        
+                        <div class="note">
+                            <strong>💡 戰略目標：</strong> 達成每日總傷害 14M 以上是每個進階玩家的必經考驗。此外，每日總傷害達到 20M 以上還可額外獲得一個傳奇寶箱，長期累積將帶來巨大的成長收益。
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. 狩獵 -->
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0 mb-6">🎯 狩獵</h2>
+                        <p>狩獵模式要求玩家佈置陣型，以對抗強大的 Boss 單位。現行版本 Boss 分為「魔花」與「雙頭龍」，兩者具有不同的弱點機制與佈陣策略。</p>
+                        
+                        <div class="stats-table-container">
+                            <div class="stats-table">
+                                <table>
+                                    <tbody>
+                                        <tr><th>對戰形式</th><td>PVE</td></tr>
+                                        <tr><th>目標</th><td>盡可能殺傷敵人</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3>賽季獎勵</h3>
+                        <p>除了少數頂端玩家，大多數玩家的通關目標是穩定獲取每個狩獵賽季的賽季獎勵。當進入第9小組時，於賽季總傷害達到 10M、30M 和 70M 時，玩家將分別獲取 100、150 及 200 鍛造石。</p>
+                    </div>
+                </section>
+
+                <!-- 4. 沙盤演兵 -->
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0 mb-6">🗂️ 沙盤演兵</h2>
+                        <p>布置部隊通關。</p>
+                        
+                        <div class="stats-table-container">
+                            <div class="stats-table">
+                                <table>
+                                    <tbody>
+                                        <tr><th>對戰形式</th><td>排兵部陣</td></tr>
+                                        <tr><th>目標</th><td>自由調整隊形，進行戰術模擬</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="note">
+                            <strong>⚠️ 筆者觀點：</strong> 在當前版本中，沙盤兵演的實用性較低，被認為是一個尚待開發或優化的設計。
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. 公會狩獵 -->
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0 mb-6">🐺 公會狩獵</h2>
+                        <p>公會狩獵為一種由玩家自行編排陣容，並對 NPC 目標進行攻擊的玩法模式。</p>
+                        
+                        <div class="stats-table-container">
+                            <div class="stats-table">
+                                <table>
+                                    <tbody>
+                                        <tr><th>對戰形式</th><td>PVE</td></tr>
+                                        <tr><th>目標</th><td>在活動時間內，對領地敵人造成傷害</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3>玩法與獎勵</h3>
+                        <p>敵人類型包含龍騎士、納迦劍聖與毒液甲蟲三種，難度依序分為「簡單」、「普通」、「困難」與「瘋狂」，需完成前一難度後方可挑戰更高層級。此模式分為個人總傷害競賽與公會總傷害競賽兩部分，欲提升公會總分，需依賴成員間的良好協調與合作。主要獎勵為鑽石。</p>
+        
+                    </div>
+                </section>
+
+                <!-- 6. 公會戰爭 -->
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0 mb-6">⚔️ 公會戰爭</h2>
+                        <p>公會戰爭為遊戲中公會互動的核心 PVP 玩法。參戰公會將被分配至數個特定的沙盤地圖中，展開類似國戰模式的策略性對抗。</p>
+                        
+                        <div class="stats-table-container">
+                            <div class="stats-table">
+                                <table>
+                                    <tbody>
+                                        <tr><th>對戰形式</th><td>PVP</td></tr>
+                                        <tr><th>目標</th><td>獲取積分，提升公會排名</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3>積分獲取與團隊合作</h3>
+                        <p>獎勵分為個人積分與公會積分兩部分，積分可透過攻擊敵方玩家、佔領領地及擊敗地圖中的 Boss 來獲取。
+
+此模式的勝負不僅取決於隊伍的士兵強度，玩家的活躍程度亦具有高度影響。若公會欲取得最高積分，成員之間的緊密合作與完善的策略部署至關重要。</p>
+
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="h-20 w-full"></div>
+
+            <footer class="update-info">
+                © 萌新軍本部 製作<br>
+                內容更新時間：2026/04/02
+            </footer>
+        </div>
+    </main>
+
+    <!-- 🚀 JS 腳本 -->
+    <script>
+        const canvas = document.getElementById('windCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Wind {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.length = Math.random() * 80 + 40; this.thickness = Math.random() * 1.2 + 0.5;
+                this.speed = Math.random() * 0.8 + 0.4; this.opacity = Math.random() * 0.25 + 0.1;
+            }
+            update() { this.x += this.speed; this.y += Math.sin(this.x / 150) * 0.3; if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; } }
+            draw() {
+                ctx.beginPath(); const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0)'); grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`);
+                ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round';
+                ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke();
+            }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        window.addEventListener('resize', () => { initCanvas(); particles=[]; for(let i=0; i<35; i++) particles.push(new Wind()); });
+        initCanvas(); for(let i=0; i<35; i++) particles.push(new Wind()); animate();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            
+            // 🚀 回到頂端邏輯
+            const btt = document.getElementById('btnBackToTop');
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 400) btt.classList.add('visible');
+                else btt.classList.remove('visible');
+            });
+            btt.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        });
+    </script>
+</body>
+</html>

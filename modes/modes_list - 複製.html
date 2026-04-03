@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Inc Rising - 遊戲模式</title>
+    <!-- 使用 Tailwind CSS 處理佈局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* 🚀 頁面特定修正 */
+        .breadcrumb { font-weight: 600; color: #004e92; margin-bottom: 2rem; font-size: 1.1rem; }
+        .breadcrumb a { text-decoration: none; color: #444; transition: color 0.2s; }
+        .breadcrumb a:hover { color: #004e92; }
+
+        .mode-body h3 { font-size: 1.5rem; color: #004e92; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid rgba(0,78,146,0.1); padding-bottom: 5px; }
+        .mode-body p { margin-bottom: 1.2rem; line-height: 1.8; color: #333; font-weight: 500; }
+        
+        /* 🚀 表格樣式修正 */
+        .stats-table-container { width: 100%; margin: 2rem 0; }
+        .stats-table table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            border-radius: 1.25rem; overflow: hidden; border: 1px solid rgba(0, 78, 146, 0.1);
+            background-color: rgba(255, 255, 255, 0.2); table-layout: fixed;
+        }
+        .stats-table th { 
+            background-color: rgba(100, 116, 139, 0.1) !important; color: #004e92 !important; 
+            width: 160px; text-align: center; padding: 15px; font-weight: 800;
+            border-right: 1px solid rgba(0, 78, 146, 0.1); border-bottom: 1px solid rgba(0, 78, 146, 0.05);
+        }
+        .stats-table td { 
+            width: auto; text-align: left; padding: 15px 25px; font-weight: 600; 
+            color: #444; border-bottom: 1px solid rgba(0, 78, 146, 0.05); line-height: 1.6;
+        }
+
+        /* 🚀 鎖定底端的回到頂部按鈕樣式 */
+        .back-to-top {
+            position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(0, 78, 146, 0.2);
+            border-radius: 50%; color: #004e92; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 1000; opacity: 0; visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-to-top:hover { background: #004e92; color: white; transform: scale(1.1) translateY(-5px); }
+
+        @media (max-width: 768px) {
+            .stats-table th { width: 100px; padding: 12px 10px; font-size: 0.9rem; }
+            .stats-table td { padding: 12px 15px; font-size: 0.9rem; }
+            .mode-body h3 { font-size: 1.3rem; }
+            .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="windCanvas"></canvas>
+
+    <!-- 🚀 回到頂端按鈕 -->
+    <div id="btnBackToTop" class="back-to-top" title="回到頂部">▲</div>
+
+    <main class="main-container">
+        <div class="relative z-20 w-full flex flex-col mode-body">
+            
+            <nav class="breadcrumb">
+                <a href="../index.html">🏠 首頁</a> <span class="mx-2 text-gray-400">/</span> 遊戲模式
+            </nav>
+
+            <div class="hero-section">
+                <h1 class="text-4xl font-bold mb-4 text-blue-900 text-center">🕹️ 遊戲模式(待更新)</h1>
+                <p class="text-gray-700 text-center font-medium opacity-80 mb-8">各類型 PVE 與 PVP 玩法機制與獎勵全解析</p>
+            </div>
+            
+            <hr class="my-8 border-t border-black/10">
+
+            <div class="space-y-12">
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">🤝 協作模式</h2>
+<br><br>
+協作模式是遊戲內建的合作塔防。此模式直接套用玩家培養的士兵等級，因此士兵等級是影響通關難度的核心因素，等級越高，不僅容錯率大幅提升，挑戰更高波次的成功率也會增加。
+                        <div class="stats-table-container"><div class="stats-table"><table><tbody><tr><th>對戰形式</th><td>塔防合作</td></tr><tr><th>目標</th><td>盡可能通關最高波次</td></tr></tbody></table></div></div>
+                        <h3>獨特機制</h3><p>包含「轉盤」及「骰子大富翁」。天使惡魔系統需開局前協調策略。</p>
+                    </div>
+                </section>
+
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">♾️ 無限</h2>
+                        <div class="stats-table-container"><div class="stats-table"><table><tbody><tr><th>對戰形式</th><td>PVE</td></tr><tr><th>主要目標</th><td>盡可能殺傷敵人</td></tr></tbody></table></div></div>
+                        <h3>分組與獎勵</h3><p>核心獎勵為鍛造石。每日傷害 7M 以上是進階玩家的目標。</p>
+                    </div>
+                </section>
+
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">🎯 狩獵</h2>
+                        <div class="stats-table-container"><div class="stats-table"><table><tbody><tr><th>對戰形式</th><td>PVE</td></tr><tr><th>主要目標</th><td>穩定獲取賽季鍛造石獎勵</td></tr></tbody></table></div></div>
+                    </div>
+                </section>
+
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">🗂️ 沙盤演兵</h2>
+                        <div class="stats-table-container"><div class="stats-table"><table><tbody><tr><th>對戰形式</th><td>排兵布陣</td></tr><tr><th>主要目標</th><td>通關特定挑戰</td></tr></tbody></table></div></div>
+                    </div>
+                </section>
+
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">🐺 公會狩獵</h2>
+                        <div class="stats-table-container"><div class="stats-table"><table><tbody><tr><th>對戰形式</th><td>PVE 團隊挑戰</td></tr><tr><th>主要目標</th><td>對領地敵人造成傷害</td></tr></tbody></table></div></div>
+                    </div>
+                </section>
+
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2 class="text-2xl font-bold text-blue-900 border-none mt-0">⚔️ 公會戰爭</h2>
+                        <div class="stats-table-container"><div class="stats-table"><table><tbody><tr><th>對戰形式</th><td>PVP 策略國戰</td></tr><tr><th>主要目標</th><td>獲取積分，提升公會排名</td></tr></tbody></table></div></div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="h-20 w-full"></div>
+            <footer class="update-info">© 萌新軍本部 製作 | 內容更新時間：2026/01/04</footer>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('windCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Wind {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.length = Math.random() * 80 + 40; this.thickness = Math.random() * 1.2 + 0.5;
+                this.speed = Math.random() * 0.8 + 0.4; this.opacity = Math.random() * 0.25 + 0.1;
+            }
+            update() { this.x += this.speed; this.y += Math.sin(this.x / 150) * 0.3; if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; } }
+            draw() {
+                ctx.beginPath(); const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0)'); grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`);
+                ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round';
+                ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke();
+            }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        window.addEventListener('resize', () => { initCanvas(); particles=[]; for(let i=0; i<35; i++) particles.push(new Wind()); });
+        initCanvas(); for(let i=0; i<35; i++) particles.push(new Wind()); animate();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            
+            // 🚀 回到頂端邏輯
+            const btt = document.getElementById('btnBackToTop');
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 400) btt.classList.add('visible');
+                else btt.classList.remove('visible');
+            });
+            btt.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        });
+    </script>
+</body>
+</html>
