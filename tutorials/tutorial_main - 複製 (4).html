@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Inc Rising - Advanced Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="tutorial_data.js"></script>
+    <style>
+        .lang-switcher { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+        .lang-select { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 2px solid #004e92; color: #004e92; padding: 8px 15px; border-radius: 50px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .breadcrumb { font-weight: 600; color: #004e92; margin-bottom: 2rem; font-size: 1.1rem; }
+        .breadcrumb a { text-decoration: none; color: #444; }
+
+        .guide-body h3 { font-size: 1.6rem; color: #004e92; font-weight: 800; margin-top: 2.5rem; margin-bottom: 1.2rem; border-bottom: 2px solid rgba(0,78,146,0.1); padding-bottom: 5px; }
+        .guide-body h4 { font-size: 1.25rem; color: #1e3a8a; font-weight: 800; margin-top: 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; }
+        .guide-body h4::before { content: "◆"; color: #004e92; margin-right: 10px; font-size: 0.9em; }
+        .guide-body p, .guide-body li { line-height: 2.0; margin-bottom: 1.2rem; color: #333; font-size: 1.1rem !important; }
+        .guide-body ul { list-style: disc; padding-left: 1.5rem; }
+
+        .stats-table table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+        .stats-table th, .stats-table td { text-align: center; padding: 15px 10px; border: 1px solid rgba(0, 78, 146, 0.1); }
+        .stats-table th { background-color: rgba(0, 78, 146, 0.05) !important; color: #004e92 !important; font-weight: 800; }
+        .recommend-left { text-align: left !important; padding-left: 25px !important; }
+        .tier-label { color: #004e92; font-weight: 900; margin-right: 5px; }
+
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 50%; color: #004e92; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.4s; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
+        @media (max-width: 768px) { .back-to-top { bottom: 20px; right: 20px; } .lang-switcher { top: 10px; right: 10px; } .recommend-left { padding-left: 10px !important; } }
+    </style>
+</head>
+<body>
+    <canvas id="windCanvas"></canvas>
+    <div class="lang-switcher"><select id="langSelect" class="lang-select"><option value="zh">繁體中文</option><option value="cn">简体中文</option><option value="en">English</option></select></div>
+    <div id="btnBackToTop" class="back-to-top">▲</div>
+
+    <main class="main-container">
+        <div class="relative z-20 w-full flex flex-col guide-body">
+            <nav class="breadcrumb"><a href="../index.html" id="ui-home">🏠 首頁</a> <span class="mx-2 text-gray-400">/</span> <span id="ui-breadcrumb"></span></nav>
+            <div class="hero-section text-center"><h1 class="text-4xl font-bold mb-4 text-blue-900" id="ui-title"></h1><p class="text-gray-700 font-medium opacity-80 mb-8" id="ui-subtitle"></p></div>
+            <hr class="my-8 border-t border-black/10">
+
+            <div id="guide-display-area" class="space-y-12"></div>
+
+            <div class="h-20 w-full"></div>
+            <footer class="update-info" id="ui-footer"></footer>
+        </div>
+    </main>
+
+    <script>
+        let currentLang = localStorage.getItem('prefLang') || 'zh';
+
+        function renderPage() {
+            const ui = TUTORIAL_DATABASE.ui[currentLang];
+            const sections = TUTORIAL_DATABASE.sections;
+
+            document.getElementById('ui-title').innerText = ui.title;
+            document.getElementById('ui-subtitle').innerText = ui.subtitle;
+            document.getElementById('ui-home').innerText = ui.breadcrumb_home;
+            document.getElementById('ui-breadcrumb').innerText = ui.breadcrumb_current;
+            document.getElementById('ui-footer').innerText = ui.footer;
+            document.getElementById('btnBackToTop').innerText = ui.back_to_top;
+
+            const area = document.getElementById('guide-display-area');
+            area.innerHTML = '';
+
+            sections.forEach(sec => {
+                let html = `
+                    <section class="blur-card reveal">
+                        <div class="text-content text-left w-full">
+                            <h2 class="text-2xl font-black text-blue-900 border-none mt-0 mb-6">
+                                ${currentLang === 'zh' ? sec.title_zh : (currentLang === 'cn' ? sec.title_cn : sec.title_en)}
+                            </h2>
+                            <p>${currentLang === 'zh' ? sec.content_zh : (currentLang === 'cn' ? sec.content_cn : sec.content_en)}</p>
+                `;
+
+                if (sec.note_zh) {
+                    html += `<div class="note">${currentLang === 'zh' ? sec.note_zh : (currentLang === 'cn' ? sec.note_cn : sec.note_en)}</div>`;
+                }
+
+                if (sec.sub_sections) {
+                    sec.sub_sections.forEach(sub => {
+                        html += `<h3>${currentLang === 'zh' ? sub.t_zh : (currentLang === 'cn' ? sub.t_cn : sub.t_en)}</h3>`;
+                        
+                        if (sub.is_grid) {
+                            html += `
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-center">
+                                    <div class="p-6 bg-white/20 rounded-2xl border border-white/30">
+                                        <h4 class="mt-0 border-none justify-center">${currentLang === 'zh' ? sub.c1_t_zh : (currentLang === 'cn' ? sub.c1_t_cn : sub.c1_t_en)}</h4>
+                                        <p class="m-0">${currentLang === 'zh' ? sub.c1_c_zh : (currentLang === 'cn' ? sub.c1_c_cn : sub.c1_c_en)}</p>
+                                    </div>
+                                    <div class="p-6 bg-white/20 rounded-2xl border border-white/30">
+                                        <h4 class="mt-0 border-none justify-center">${currentLang === 'zh' ? sub.c2_t_zh : (currentLang === 'cn' ? sub.c2_t_cn : sub.c2_t_en)}</h4>
+                                        <p class="m-0">${currentLang === 'zh' ? sub.c2_c_zh : (currentLang === 'cn' ? sub.c2_c_cn : sub.c2_c_en)}</p>
+                                    </div>
+                                </div>`;
+                        }
+
+                        if (sub.c_zh) {
+                            html += `<p>${currentLang === 'zh' ? sub.c_zh : (currentLang === 'cn' ? sub.c_cn : sub.c_en)}</p>`;
+                        }
+
+                        if (sub.has_recruit_table) {
+                            html += `
+                                <div class="stats-table overflow-x-auto">
+                                    <table>
+                                        <thead><tr><th>${currentLang==='en'?'Stage':'招募階段'}</th><th>${currentLang==='en'?'Unlock':'開放等級'}</th><th>${currentLang==='en'?'Price':'價格'}</th><th>${currentLang==='en'?'Epic %':'史詩機率'}</th><th>${currentLang==='en'?'Unit Lv.':'士兵等級'}</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>${currentLang==='en'?'Initial':'初始'}</td><td>1</td><td>24,000</td><td>3%</td><td>1</td></tr>
+                                            <tr><td>${currentLang==='en'?'Stage 2':'階段二'}</td><td>10</td><td>48,000</td><td>6%</td><td>2</td></tr>
+                                            <tr><td>${currentLang==='en'?'Stage 3':'階段三'}</td><td>15</td><td>96,000</td><td>12%</td><td>3</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>`;
+                        }
+
+                        if (sub.has_recommend_table) {
+                            html += `
+                                <div class="stats-table overflow-x-auto">
+                                    <table>
+                                        <thead><tr><th style="width: 25%;">${ui.table_type}</th><th class="recommend-left">${ui.table_recommend}</th></tr></thead>
+                                        <tbody>
+                                            <tr><td class="font-black">Tank</td><td class="recommend-left"><span class="tier-label">Starter:</span> Pumpkin Guard, Rock Thrower, Paladin<br><span class="tier-label">Mid:</span> The Knight King, Flame Duelist, Gryphon Knight, Sakura Ronin<br><span class="tier-label">High:</span> Goddess of War, Barbarian Tyrant, Radiant Warrior</td></tr>
+                                            <tr><td class="font-black">Single</td><td class="recommend-left"><span class="tier-label">Starter:</span> Forest Scout, Apprentice Mage, Flame Mage<br><span class="tier-label">Mid:</span> Elven Archer, Windlord<br><span class="tier-label">High:</span> Elven Archer(Lv.8+), Nine-Tailed Fox, Jungle Ranger, Mist Archer, Bone Marksman</td></tr>
+                                            <tr><td class="font-black">AOE</td><td class="recommend-left"><span class="tier-label">Starter:</span> Forest Scout, Poison Master<br><span class="tier-label">Mid:</span> Wind Apostle, Ashen Arcenist, Ursa Champion, Geomancer, Storm Maiden, Fury Cannoneer<br><span class="tier-label">High:</span> Ursa Champion(Lv.8+), Jungle Ranger, Bone Marksman, Red Blade</td></tr>
+                                            <tr><td class="font-black">Utility</td><td class="recommend-left"><span class="tier-label">Raid:</span> Frost Queen, Bomber<br><span class="tier-label">Buff:</span> Oracle, Melody Weaver, Starlight Apostle, Ripple Wizard, Tide Lord, Blazeking<br><span class="tier-label">Debuff:</span> Iron Bulwark, Rock Thrower, Frost Skeleton<br><span class="tier-label">Heal:</span> Wooden Wizard, Woodland Guardian</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>`;
+                        }
+
+                        if (sub.has_forge_table) {
+                            html += `
+                                <div class="stats-table overflow-x-auto">
+                                    <table>
+                                        <thead><tr><th>Rarity</th><th>6 ➔ 7 Cost</th><th>7 ➔ 8 Cost</th><th>8 ➔ 9 Cost</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>Common</td><td>32</td><td>80</td><td>240</td></tr>
+                                            <tr><td>Rare</td><td>64</td><td>160</td><td>480</td></tr>
+                                            <tr><td>Epic</td><td>960</td><td>2,220</td><td>3,640</td></tr>
+                                            <tr><td>Legendary</td><td>1,920</td><td>4,440</td><td>7,120</td></tr>
+                                            <tr><td>Mythic</td><td>2,560</td><td>5,920</td><td>9,600</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>`;
+                        }
+
+                        if (sub.has_income_table) {
+                            html += `
+                                <div class="stats-table overflow-x-auto">
+                                    <table>
+                                        <thead><tr><th>Source</th><th>Frequency</th><th>Amount</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>Daily Tasks</td><td>Cycle</td><td>6,400</td></tr>
+                                            <tr><td>Command Center</td><td>Cycle</td><td>7,200</td></tr>
+                                            <tr><td>Free Pass</td><td>Cycle</td><td>1,020</td></tr>
+                                            <tr><td>Guild Rewards</td><td>Cycle</td><td>10,000~15,000</td></tr>
+                                            <tr><td>Battle Pass</td><td>Cycle</td><td>3,800</td></tr>
+                                            <tr><td>Diamond Pass</td><td>30 Days</td><td>15,200</td></tr>
+                                            <tr style="background: rgba(0,78,146,0.05); font-weight: 800;"><td>Total Est.</td><td colspan="2">25,000 ~ 50,000 Diamonds</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>`;
+                        }
+
+                        if (sub.has_tier_table) {
+                            html += `
+                                <div class="stats-table overflow-x-auto">
+                                    <table>
+                                        <thead><tr><th>Tier</th><th>NTD</th><th>USD</th><th>CNY</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>F2P</td><td>0</td><td>$0</td><td>¥0</td></tr>
+                                            <tr><td>Micro</td><td>330</td><td>$11</td><td>¥75</td></tr>
+                                            <tr><td>Small</td><td>1,000</td><td>$32</td><td>¥225</td></tr>
+                                            <tr><td>Low-Mid</td><td>1,600~2,600</td><td>$50~$82</td><td>¥360~¥585</td></tr>
+                                            <tr><td>Mid</td><td>4,000~9,000</td><td>$125~$282</td><td>¥900~¥2025</td></tr>
+                                            <tr><td>Whale</td><td colspan="3">Unlimited</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>`;
+                        }
+                    });
+                }
+
+                if (sec.final_note_zh) {
+                    html += `<div class="note mt-10">${currentLang === 'zh' ? sec.final_note_zh : (currentLang === 'cn' ? sec.final_note_cn : sec.final_note_en)}</div>`;
+                }
+
+                html += `</div></section>`;
+                area.innerHTML += html;
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.05 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        document.getElementById('langSelect').addEventListener('change', (e) => { currentLang = e.target.value; localStorage.setItem('prefLang', currentLang); renderPage(); });
+        const btt = document.getElementById('btnBackToTop');
+        window.addEventListener('scroll', () => { if (window.pageYOffset > 400) btt.classList.add('visible'); else btt.classList.remove('visible'); });
+        btt.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        document.getElementById('langSelect').value = currentLang;
+        renderPage();
+    </script>
+    <script>
+        const canvas = document.getElementById('windCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Wind {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.length = Math.random() * 80 + 40; this.thickness = Math.random() * 1.2 + 0.5; this.speed = Math.random() * 0.8 + 0.4; this.opacity = Math.random() * 0.3 + 0.15; }
+            update() { this.x += this.speed; this.y += Math.sin(this.x / 150) * 0.3; if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; } }
+            draw() { ctx.beginPath(); const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y); grad.addColorStop(0, 'rgba(255, 255, 255, 0)'); grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`); ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round'; ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke(); }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        window.addEventListener('resize', () => { initCanvas(); particles=[]; for(let i=0; i<35; i++) particles.push(new Wind()); });
+        initCanvas(); for(let i=0; i<35; i++) particles.push(new Wind()); animate();
+    </script>
+</body>
+</html>

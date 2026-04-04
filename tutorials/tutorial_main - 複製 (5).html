@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Inc Rising - Advanced Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="tutorial_data.js"></script>
+    <style>
+        .lang-switcher { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+        .lang-select { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 2px solid #004e92; color: #004e92; padding: 8px 15px; border-radius: 50px; font-weight: 800; cursor: pointer; }
+        .breadcrumb { font-weight: 600; color: #004e92; margin-bottom: 2rem; font-size: 1.1rem; }
+        .breadcrumb a { text-decoration: none; color: #444; }
+
+        /* 🚀 攻略專屬排版優化 */
+        .guide-body h2 { font-size: 1.8rem !important; color: #004e92; font-weight: 900; border-bottom: 3px solid rgba(0, 78, 146, 0.1); padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+        .guide-body h3 { font-size: 1.6rem !important; color: #004e92; font-weight: 800; margin-top: 2.5rem; margin-bottom: 1.2rem; }
+        .guide-body h4 { font-size: 1.25rem !important; color: #1e3a8a; font-weight: 800; margin-top: 1.5rem; margin-bottom: 1rem; }
+        .guide-body p, .guide-body li { line-height: 2.0; margin-bottom: 1.2rem; color: #333; font-size: 1.15rem !important; font-weight: 400; }
+        
+        /* 表格規格修正 */
+        .stats-table table { width: 100%; border-collapse: collapse; font-size: 1.1rem; }
+        .stats-table th, .stats-table td { text-align: center; padding: 16px 12px; border: 1px solid rgba(0, 78, 146, 0.1); }
+        .stats-table th { background-color: rgba(0, 78, 146, 0.05) !important; color: #004e92 !important; font-weight: 800; }
+        .recommend-left { text-align: left !important; padding-left: 30px !important; }
+        .tier-label { color: #004e92; font-weight: 900; margin-right: 5px; }
+
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 50%; color: #004e92; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.4s; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
+
+        @media (max-width: 768px) { .main-container { padding: 1.5rem 1rem; } .stats-table table { font-size: 1rem; } .lang-switcher { top: 10px; right: 10px; } .recommend-left { padding-left: 15px !important; } }
+    </style>
+</head>
+<body>
+    <canvas id="windCanvas"></canvas>
+    <div class="lang-switcher">
+        <select id="langSelect" class="lang-select">
+            <option value="zh">繁體中文</option>
+            <option value="cn">简体中文</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+    <div id="btnBackToTop" class="back-to-top">▲</div>
+
+    <main class="main-container">
+        <div class="relative z-20 w-full flex flex-col guide-body">
+            
+            <nav class="breadcrumb"><a href="../index.html" id="ui-home">🏠 首頁</a> <span class="mx-2 text-gray-400">/</span> <span id="ui-breadcrumb"></span></nav>
+            <div class="hero-section text-center"><h1 class="text-4xl font-bold mb-4 text-blue-900" id="ui-title"></h1><p class="text-gray-700 font-medium opacity-80 mb-8" id="ui-subtitle"></p></div>
+            <hr class="my-8 border-t border-black/10">
+
+            <div id="tutorial-display-area" class="space-y-12">
+                <!-- 由腳本填充 100% 無損內容 -->
+            </div>
+
+            <div class="h-20 w-full"></div>
+            <footer class="update-info" id="ui-footer"></footer>
+        </div>
+    </main>
+
+    <script>
+        let currentLang = localStorage.getItem('prefLang') || 'zh';
+
+        function renderPage() {
+            const ui = TUTORIAL_DATABASE.ui[currentLang];
+            const data = TUTORIAL_DATABASE.content;
+
+            document.getElementById('ui-title').innerText = ui.title;
+            document.getElementById('ui-subtitle').innerText = ui.subtitle;
+            document.getElementById('ui-home').innerText = ui.breadcrumb_home;
+            document.getElementById('ui-breadcrumb').innerText = ui.breadcrumb_current;
+            document.getElementById('ui-footer').innerText = ui.footer;
+            document.getElementById('btnBackToTop').innerText = ui.back_to_top;
+
+            const area = document.getElementById('tutorial-display-area');
+            area.innerHTML = '';
+
+            // 1. 付費認知
+            area.innerHTML += `
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2>${currentLang === 'zh' ? data.payment.title_zh : (currentLang === 'cn' ? data.payment.title_cn : data.payment.title_en)}</h2>
+                        <p>${currentLang === 'zh' ? data.payment.p1_zh : data.payment.p1_zh}</p>
+                        <p>${data.payment.p2_zh}</p>
+                        <p>${data.payment.p3_zh}</p>
+                        <p>${data.payment.p4_zh}</p>
+                    </div>
+                </section>`;
+
+            // 2. 招募策略
+            let mythHtml = "";
+            data.recruitment.mythic_types_zh.forEach(item => mythHtml += `<li>${item}</li>`);
+            
+            let arenaRows = "";
+            data.recruitment.arena_table_zh.forEach(row => {
+                arenaRows += `<tr><td class="font-black">${row[0]}</td><td class="recommend-left text-base">${row[1]}</td></tr>`;
+            });
+
+            area.innerHTML += `
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2>${data.recruitment.title_zh}</h2>
+                        <p>${data.recruitment.p1_zh}</p>
+                        <h3>${data.recruitment.h1_zh}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center mb-10">
+                            <div class="p-6 bg-white/20 rounded-2xl border border-white/30"><h4>PVE</h4><p>${data.recruitment.pve_list_zh}</p></div>
+                            <div class="p-6 bg-white/20 rounded-2xl border border-white/30"><h4>PVP</h4><p>${data.recruitment.pvp_list_zh}</p></div>
+                        </div>
+                        <h3>${data.recruitment.h2_zh}</h3><p>${data.recruitment.rarity_zh}</p>
+                        <h3>${data.recruitment.h3_zh}</h3><ul class="space-y-4">${mythHtml}</ul>
+                        <h3>${data.recruitment.h4_zh}</h3>
+                        <div class="stats-table overflow-x-auto"><table><thead><tr><th>${ui.table_head_type}</th><th class="recommend-left">${ui.table_head_unit}</th></tr></thead><tbody>${arenaRows}</tbody></table></div>
+                    </div>
+                </section>`;
+
+            // 3. 鍛造石
+            let forgeRows = "";
+            data.forge.table_zh.forEach(row => {
+                forgeRows += `<tr><td class="font-bold">${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
+            });
+
+            area.innerHTML += `
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2>${data.forge.title_zh}</h2>
+                        <p>${data.forge.p1_zh}</p>
+                        <div class="note">${data.forge.note_zh}</div>
+                        <p>${data.forge.p2_zh}</p>
+                        <div class="stats-table overflow-x-auto"><table><thead><tr><th>稀有度</th><th>6➔7</th><th>7➔8</th><th>8➔9</th></tr></thead><tbody>${forgeRows}</tbody></table></div>
+                    </div>
+                </section>`;
+
+            // 4. 課金養成 (全數還原)
+            let incomeRows = "";
+            data.spending.income_zh.forEach(row => incomeRows += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`);
+            
+            let tierRows = "";
+            data.spending.tiers_zh.forEach(row => tierRows += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`);
+
+            area.innerHTML += `
+                <section class="blur-card reveal">
+                    <div class="text-content text-left w-full">
+                        <h2>${data.spending.title_zh}</h2>
+                        <h3>🔹 鑽石收入分析</h3>
+                        <div class="stats-table overflow-x-auto"><table><thead><tr><th>來源</th><th>頻率</th><th>預估</th></tr></thead><tbody>${incomeRows}</tbody></table></div>
+                        <h3>🏷️ 課金分級</h3>
+                        <div class="stats-table overflow-x-auto"><table><thead><tr><th>等級</th><th>說明</th><th>預估</th></tr></thead><tbody>${tierRows}</tbody></table></div>
+                        <h3 class="mt-10">🏗️ 養成策略</h3>
+                        <div class="space-y-6">
+                            <div class="p-6 bg-white/20 rounded-2xl border border-white/30"><h4>微課 / 小課</h4><p>${data.spending.strategy_low_zh}</p></div>
+                            <div class="p-6 bg-white/20 rounded-2xl border border-white/30"><h4>中小課 / 中課</h4><p>${data.spending.strategy_high_zh}</p></div>
+                        </div>
+                        <div class="note mt-10">${data.spending.final_note_zh}</div>
+                    </div>
+                </section>`;
+
+            refreshObservers();
+        }
+
+        document.getElementById('langSelect').addEventListener('change', (e) => { currentLang = e.target.value; localStorage.setItem('prefLang', currentLang); renderPage(); });
+        function refreshObservers() { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); }); }, { threshold: 0.05 }); document.querySelectorAll('.reveal').forEach(el => observer.observe(el)); }
+        const btt = document.getElementById('btnBackToTop');
+        window.addEventListener('scroll', () => { if (window.pageYOffset > 400) btt.classList.add('visible'); else btt.classList.remove('visible'); });
+        btt.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        document.getElementById('langSelect').value = currentLang;
+        renderPage();
+    </script>
+    <script>
+        // 粒子特效
+        const canvas = document.getElementById('windCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Wind {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.length = Math.random() * 80 + 40; this.thickness = Math.random() * 1.2 + 0.5; this.speed = Math.random() * 0.8 + 0.4; this.opacity = Math.random() * 0.3 + 0.15; }
+            update() { this.x += this.speed; this.y += Math.sin(this.x / 150) * 0.3; if (this.x - this.length > canvas.width) { this.x = -this.length; this.y = Math.random() * canvas.height; } }
+            draw() { ctx.beginPath(); const grad = ctx.createLinearGradient(this.x - this.length, this.y, this.x, this.y); grad.addColorStop(0, 'rgba(255, 255, 255, 0)'); grad.addColorStop(1, `rgba(255, 255, 255, ${this.opacity})`); ctx.strokeStyle = grad; ctx.lineWidth = this.thickness; ctx.lineCap = 'round'; ctx.moveTo(this.x - this.length, this.y); ctx.lineTo(this.x, this.y); ctx.stroke(); }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        window.addEventListener('resize', () => { initCanvas(); particles=[]; for(let i=0; i<35; i++) particles.push(new Wind()); });
+        initCanvas(); for(let i=0; i<35; i++) particles.push(new Wind()); animate();
+    </script>
+</body>
+</html>
