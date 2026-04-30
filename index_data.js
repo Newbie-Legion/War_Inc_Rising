@@ -63,13 +63,13 @@ const INDEX_DATABASE = {
       "en": "🏆 萌新軍本部 | High Power × High Activity (Discord Required)" 
     },
     { 
-      "zh": "🌙 新月軍新月 ｜ 中戰力   × 高活躍（需加入 Discord）", 
-      "cn": "🌙 新月军新月 ｜ 中战力   × 高活跃（需加入 Discord）", 
-      "en": "🌙 新月軍新月 | Mid Power × High Activity (Discord Required)" 
+      "zh": "🌙 萌新軍新月 ｜ 高戰力   × 高活躍（需加入 Discord）", 
+      "cn": "🌙 萌新军新月 ｜ 高战力   × 高活跃（需加入 Discord）", 
+      "en": "🌙 萌新軍新月 | Mid Power × High Activity (Discord Required)" 
     },
     { 
       "zh": "⚔️ 萌新軍破曉 ｜ 戰力不拘 × 高活躍（需加入 Discord）", 
-      "cn": "⚔️ 萌新军破晓 ｜ 战力不拘 × 高活跃（需加入 Discord）", 
+      "cn": "⚔️ 萌新军破晓 ｜ 中战力 × 高活跃（需加入 Discord）", 
       "en": "⚔️ 萌新軍破曉 | All Power × High Activity (Discord Required)" 
     },
     { 
