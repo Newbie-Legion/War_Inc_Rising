@@ -66,7 +66,7 @@ const GUILD_APP_DATABASE = {
           "id": "38779" 
         },
         { 
-          "name_zh": "🌙 新月軍新月", "name_cn": "🌙 新月军新月", "name_en": "🌙 新月軍新月", 
+          "name_zh": "🌙 萌新軍新月", "name_cn": "🌙 萌新军新月", "name_en": "🌙 萌新軍新月", 
           "id": "1202849" 
         },
         { 
