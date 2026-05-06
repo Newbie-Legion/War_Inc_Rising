@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title data-translate="title">War Inc Rising 協作模式模擬器</title>
+    <style>
+        /* 基本樣式和排版 */
+        :root {
+            --primary-color: #0b79ff;
+            --background-color: #f0f2f5;
+            --card-color: #ffffff;
+            --text-color: #222;
+            --secondary-text-color: #666;
+            --warn-color: #b21c1c;
+            --border-color: #e0e0e0;
+            --highlight-color: #fff3cd;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: var(--background-color);
+            color: var(--text-color);
+            font-size: 15px; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 24px;
+            text-align: center;
+            /* 修正：移除 position: relative; */
+            margin: 0 0 16px; 
+            color: var(--primary-color);
+        }
+
+        /* 語言切換：預設在頂部右側 (電腦版) */
+        .lang-toggle-container {
+            position: absolute;
+            top: 16px; /* 距離頂部 16px */
+            right: 16px; /* 距離右側 16px */
+            margin-bottom: 0;
+            /* 將標題移到 container 中，讓 container 作為 relative */
+            z-index: 10; 
+        }
+
+        /* 修正：在小螢幕上將語言選單移到標題下方 */
+        @media (max-width: 600px) {
+            .lang-toggle-container {
+                /* 移除絕對定位，使其作為一般區塊元素跟隨內容流動 */
+                position: static; 
+                text-align: right; 
+                margin: -8px 0 16px 0; /* 縮小與標題的間距，並在下方留出空間 */
+            }
+            /* 讓標題在小螢幕上向左對齊，給下拉選單騰出右側空間 */
+            h1 {
+                text-align: left;
+                padding-right: 140px; /* 避免和下拉選單重疊 */
+                margin-bottom: 8px; /* 減少標題與其下方內容的間距 */
+            }
+        }
+        /* End Media Query Fix */
+
+
+        #langSelect {
+            padding: 6px 10px;
+            font-size: 14px;
+            border: 1px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%230b79ff%22%20d%3D%22M287%20176.6c-4.3%204.3-10%206.4-16%206.4s-11.7-2.1-16-6.4L146.2%2073.8%2037.4%20176.6c-4.3%204.3-10%206.4-16%206.4s-11.7-2.1-16-6.4c-8.5-8.5-8.5-22.1%200-30.6L131.2%2043.2c8.5-8.5%2022.1-8.5%2030.6%200l131.2%20102.8c8.5%208.5%208.5%2022.1%200%2030.6z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 10px;
+            padding-right: 25px; 
+            min-width: 130px;
+        }
+        .card {
+            background: var(--card-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px; 
+            color: var(--text-color);
+            border-left: 4px solid var(--primary-color);
+            padding-left: 8px;
+        }
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); 
+            gap: 12px;
+            margin-bottom: 12px; 
+        }
+        
+        /* 標籤高度與對齊 */
+        .field label {
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            height: 38px; 
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: var(--secondary-text-color);
+            text-align: center;
+        }
+        
+        /* 提示文字間距統一 */
+        .note {
+            font-size: 14px;
+            color: var(--secondary-text-color);
+            margin: 0; 
+        }
+        .note p {
+            margin: 4px 0 10px 0; 
+        }
+        
+        input[type=number] {
+            width: 100%;
+            padding: 10px; 
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+            box-sizing: border-box;
+            background: #fafafa;
+            -moz-appearance: textfield;
+        }
+        
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(11, 121, 255, 0.2);
+            outline: none;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px; 
+            font-size: 16px; 
+            border: 0;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px; 
+            box-shadow: 0 4px 8px rgba(11, 121, 255, 0.3);
+            box-sizing: border-box;
+            display: block;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(11, 121, 255, 0.4);
+        }
+        .btn-secondary {
+            padding: 12px;
+            font-size: 16px;
+            background: #6c757d;
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+            margin-top: 16px;
+        }
+        .btn-save {
+            background: #1e7e34;
+            margin-top: 8px;
+            box-shadow: 0 4px 8px rgba(30, 126, 52, 0.3);
+        }
+        .btn-clear-all {
+            background: #ffffff;
+            color: var(--warn-color);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+            margin-top: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: auto;
+            transition: background 0.2s;
+        }
+        .btn-clear-all:hover {
+            background: #f0f0f0;
+        }
+        .btn-clear-record {
+            background: none;
+            color: var(--warn-color);
+            border: 1px solid var(--warn-color);
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 6px;
+            margin: 0;
+            cursor: pointer;
+            transition: background 0.2s;
+            float: right; 
+            width: auto;
+        }
+        .btn-clear-record:hover {
+            background: rgba(178, 28, 28, 0.1);
+        }
+        .warn {
+            color: var(--warn-color);
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 8px;
+            text-align: center;
+        }
+        .summary-info {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+            padding-top: 8px;
+        }
+        
+        /* 響應式表格修正：新增表格容器 */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 14px;
+            min-width: 750px; 
+            table-layout: fixed; 
+        }
+
+        th {
+            background: var(--background-color);
+            font-weight: 700;
+            color: var(--text-color);
+            white-space: nowrap; 
+            min-height: 40px; 
+            padding: 10px 4px; 
+            vertical-align: middle;
+        }
+        
+        td {
+            border: 1px solid var(--border-color);
+            padding: 10px 4px; 
+            text-align: center;
+            vertical-align: middle;
+            word-break: normal; 
+            white-space: normal; 
+        }
+        
+        .table-footer {
+            font-weight: 700;
+            background: #e6f0ff !important;
+        }
+        #history {
+            margin-top: 24px;
+        }
+        .history-card {
+            background: var(--card-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 12px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .history-card h3 {
+            font-size: 16px;
+            margin: 0 0 8px;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-card h3 span {
+            flex-grow: 1;
+        }
+        .history-card p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+        .history-card strong {
+            color: var(--text-color);
+        }
+        .history-allocs {
+            font-size: 13px;
+            color: var(--secondary-text-color);
+            margin-top: 8px;
+            word-break: break-all;
+        }
+        .clear-all-container {
+            text-align: right;
+            margin-bottom: 16px;
+        }
+        .toggle-btn {
+            font-size: 14px;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-top: 8px;
+            display: block;
+            font-weight: 600;
+            text-align: center;
+        }
+        .record-table-container {
+            display: none;
+            overflow-x: auto;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .record-table-container table {
+            min-width: 750px; 
+            margin-top: 0;
+            table-layout: auto; 
+        }
+        
+        /* 表格欄位寬度修正 */
+        #output table tr > th:nth-child(1), 
+        #output table tr > td:nth-child(1) {
+            width: 90px; 
+        }
+        #output table tr > th:nth-child(2), 
+        #output table tr > td:nth-child(2) {
+            width: 80px; 
+        }
+        #output table tr > th:last-child, 
+        #output table tr > td:last-child {
+            width: 80px; 
+        }
+        #output table tr > th:nth-child(n+3):not(:last-child), 
+        #output table tr > td:nth-child(n+3):not(:last-child) {
+            width: auto; 
+            min-width: 50px; 
+        }
+        .record-table-container table tr > th:nth-child(n+3):not(:last-child), .record-table-container table tr > td:nth-child(n+3):not(:last-child) {
+             min-width: 50px;
+        }
+        
+        /* 新增底部作者與免責聲明樣式 */
+        .app-footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--secondary-text-color);
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        .app-footer p {
+            margin: 4px 0;
+        }
+        .app-footer strong {
+            color: var(--primary-color);
+        }
+    </style>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body class="is-responsive">
+    <div class="container" id="captureArea" style="position: relative;"> 
+        <h1 data-translate="main_title">War Inc Rising 協作模式模擬器</h1>
+        <div class="lang-toggle-container">
+            <select id="langSelect" onchange="changeLanguage(this)">
+                <option value="zh-tw">繁體中文</option>
+                <option value="zh-cn">简体中文</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        <div class="card">
+            <div class="section-title" data-translate="settings_title">礦工與回合設定</div>
+            
+            <div class="note">
+                <p data-translate="settings_note1">除手動輸入外，預設為玩家已預備幸運幣，礦區切換啟動時一次性投入。總礦工數上限為 50。</p>
+            </div>
+            
+            <div class="inputs-grid">
+                <div class="field">
+                    <label data-translate="mine1_label">礦區1 (15秒)</label>
+                    <input id="m1" type="number" min="0" data-translate-placeholder="miners_placeholder" placeholder="人數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine2_label">礦區2 (12秒)</label>
+                    <input id="m2" type="number" min="0" data-translate-placeholder="miners_placeholder" placeholder="人數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine3_label">礦區3 (9秒)</label>
+                    <input id="m3" type="number" min="0" data-translate-placeholder="miners_placeholder" placeholder="人數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine4_label">礦區4 (6秒)</label>
+                    <input id="m4" type="number" min="0" data-translate-placeholder="miners_placeholder" placeholder="人數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine5_1_label">礦區5-1 (3秒)</label>
+                    <input id="m5_1" type="number" min="0" data-translate-placeholder="miners_placeholder" placeholder="人數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine5_2_label">礦區5-2 (3秒)</label>
+                    <input id="m5_2" type="number" min="0" data-translate-placeholder="miners_placeholder" placeholder="人數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine5_3_label">礦區5-3 (3秒)</label>
+                    <input id="m5_3" type="number" min="0" data-translate-placeholder="miners_placeholder" placeholder="人數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="rounds_label">遊戲回合數</label>
+                    <input id="rounds" type="number" min="0" value="1" data-translate-placeholder="rounds_placeholder" placeholder="0 回合" step="1">
+                </div>
+            </div>
+            
+            <div class="section-title" data-translate="manual_act_title">手動啟動回合設定</div>
+            <div class="note">
+                <p data-translate="manual_act_note1">輸入 0 或留空則使用自動計算門檻，礦區5-2、5-3為玩家自定義使用，如未輸入則預設不啟動。</p>
+            </div>
+
+            <div class="inputs-grid">
+                <div class="field">
+                    <label data-translate="mine2_label">礦區2</label> 
+                    <input id="act2" type="number" min="0" value="0" data-translate-placeholder="act_rounds_placeholder" placeholder="回合數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine3_label">礦區3</label>
+                    <input id="act3" type="number" min="0" value="0" data-translate-placeholder="act_rounds_placeholder" placeholder="回合數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine4_label">礦區4</label>
+                    <input id="act4" type="number" min="0" value="0" data-translate-placeholder="act_rounds_placeholder" placeholder="回合數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine5_1_label">礦區5-1</label>
+                    <input id="act5_1" type="number" min="0" value="0" data-translate-placeholder="act_rounds_placeholder" placeholder="回合數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine5_2_label">礦區5-2</label>
+                    <input id="act5_2" type="number" min="0" value="0" data-translate-placeholder="act_rounds_placeholder" placeholder="回合數" step="1">
+                </div>
+                <div class="field">
+                    <label data-translate="mine5_3_label">礦區5-3</label>
+                    <input id="act5_3" type="number" min="0" value="0" data-translate-placeholder="act_rounds_placeholder" placeholder="回合數" step="1">
+                </div>
+                <div class="field" style="visibility:hidden;">
+                    </div>
+            </div>
+
+            <button class="btn" onclick="runSim()" data-translate="calculate_btn">開始計算</button>
+            <div id="message" class="warn" style="display:none;"></div>
+            <div id="summary" class="summary-info"></div>
+        </div>
+
+        <div id="output" class="card" style="display:none;">
+            <div class="table-wrapper">
+                 </div>
+        </div>
+        
+        <button id="downloadBtn" class="btn btn-secondary" style="display:none;" onclick="downloadImage()" data-translate="download_btn">另存為圖片</button>
+
+        <div id="history">
+            <div class="section-title" data-translate="history_title">歷史紀錄</div>
+            <div class="clear-all-container">
+                <button id="clearAllBtn" class="btn-clear-all" style="display:none;" onclick="clearAllRecords()" data-translate="clear_all_btn">清除所有紀錄</button>
+            </div>
+            <div id="history-content">
+                <p class="note" id="history-placeholder" data-translate="history_placeholder">尚無儲存的紀錄。</p>
+            </div>
+        </div>
+        
+        <div class="app-footer">
+            <p><span data-translate="maker_label">製作者</span>：<strong style="font-size: 14px;">萌新軍本部 (ID:38779) － Mr.YoYo</strong></p>
+            <p data-translate="disclaimer_note">本網頁由玩家無償製作，僅供遊戲同好交流與分享，數據如有誤差，純屬正常，僅供參考使用。</p>
+        </div>
+        </div>
+
+<script>
+    let currentLanguage = 'zh-tw'; 
+    let currentCalculationData = null; 
+    let recordIndex = 0; 
+    
+    // --- 翻譯字典 ---
+    const translations = {
+        'zh-tw': {
+            'title': 'War Inc Rising 協作模式模擬器',
+            'main_title': 'War Inc Rising 協作模式模擬器',
+            'settings_title': '礦工與回合設定',
+            'settings_note1': '除手動輸入外，預設為玩家已預備幸運幣，礦區切換啟動時一次性投入。總礦工數上限為 50。',
+            'miners_placeholder': '人數',
+            'rounds_label': '遊戲回合數',
+            'rounds_placeholder': '0 回合',
+            'manual_act_title': '手動啟動回合設定',
+            'manual_act_note1': '輸入 0 或留空則使用自動計算門檻，礦區5-2、5-3為玩家自定義使用，如未輸入則預設不啟動。', 
+            'act_rounds_placeholder': '回合數',
+            'calculate_btn': '開始計算',
+            'download_btn': '另存為圖片',
+            'history_title': '歷史紀錄',
+            'clear_all_btn': '清除所有紀錄',
+            'history_placeholder': '尚無儲存的紀錄。',
+            'mine1_label': '礦區1 (15秒)', 'mine2_label': '礦區2 (12秒)', 'mine3_label': '礦區3 (9秒)', 
+            'mine4_label': '礦區4 (6秒)', 'mine5_1_label': '礦區5-1 (3秒)', 'mine5_2_label': '礦區5-2 (3秒)', 
+            'mine5_3_label': '礦區5-3 (3秒)',
+            'output_title': '模擬結果',
+            'output_note': '「產出」為幸運幣數量。',
+            'save_record_btn': '儲存本次紀錄',
+            'table_mine': '礦區', 'table_act_round': '啟動回合', 'table_total_output': '總產出',
+            'table_total': '總計',
+            'act_not_ready': '未啟動', 'act_no_alloc': '無分配',
+            'summary_alloc': '總礦工數：', 'summary_rounds': ' ｜ 總回合數：', 'summary_sec': ' 秒)',
+            'summary_final_coin': ' ｜ 最終幸運幣: ',
+            'record_title_prefix': '紀錄 #', 'record_clear_btn': '清除',
+            'record_output': '總產出：', 'record_coin': ' 幸運幣',
+            'record_miners': '總礦工：', 'record_person': ' 人',
+            'record_rounds_num': ' | 回合數：', 'record_rounds_unit': ' 回合',
+            'record_alloc_label': '礦區分配 (1-5-3): ', 'record_actual_act_label': '實際啟動回合 (1-5-3)：', 
+            'record_manual_act_label': '手動啟動回合 (2-5-3): ',
+            'toggle_expand': '查看詳細表格 [+]' , 'toggle_collapse': '收起詳細表格 [-]',
+            'alert_no_calc': '請先點擊「開始計算」以獲得結果！',
+            'confirm_clear_one': '確定要清除這筆紀錄嗎？', 'confirm_clear_all': '確定要清除所有歷史紀錄嗎？',
+            // --- 錯誤訊息部分 ---
+            'error_prefix': '錯誤：',
+            'error_total_miners_label': '總礦工數',
+            'error_suffix': '超過上限',
+            // --------------------
+            'maker_label': '製作者', 
+            'disclaimer_note': '本網頁由玩家無償製作，僅供遊戲同好交流與分享，數據如有誤差，純屬正常，僅供參考使用。'
+        },
+        'zh-cn': {
+            'title': 'War Inc Rising 协作模式模拟器',
+            'main_title': 'War Inc Rising 协作模式模拟器',
+            'settings_title': '矿工与回合设置',
+            'settings_note1': '除手动输入外，预设为玩家已预备幸运币，矿区切换启动时一次性投入。总矿工数上限为 50。',
+            'miners_placeholder': '人数',
+            'rounds_label': '游戏回合数',
+            'rounds_placeholder': '0 回合',
+            'manual_act_title': '手动启动回合设置',
+            'manual_act_note1': '输入 0 或留空则使用自动计算门槛，矿区5-2、5-3为玩家自定义使用，如未输入则默认不启动。', 
+            'act_rounds_placeholder': '回合数',
+            'calculate_btn': '开始计算',
+            'download_btn': '另存为图片',
+            'history_title': '历史记录',
+            'clear_all_btn': '清除所有记录',
+            'history_placeholder': '暂无保存的记录。',
+            'mine1_label': '矿区1 (15秒)', 'mine2_label': '矿区2 (12秒)', 'mine3_label': '矿区3 (9秒)', 
+            'mine4_label': '矿区4 (6秒)', 'mine5_1_label': '矿区5-1 (3秒)', 'mine5_2_label': '矿区5-2 (3秒)', 
+            'mine5_3_label': '矿区5-3 (3秒)',
+            'output_title': '模拟结果',
+            'output_note': '“产出”为幸运币数量。',
+            'save_record_btn': '保存本次记录',
+            'table_mine': '矿区', 'table_act_round': '启动回合', 'table_total_output': '总产出',
+            'table_total': '总计',
+            'act_not_ready': '未启动', 'act_no_alloc': '无分配',
+            'summary_alloc': '总矿工数：', 'summary_rounds': ' ｜ 总回合数：', 'summary_sec': ' 秒)',
+            'summary_final_coin': ' ｜ 最终幸运币: ',
+            'record_title_prefix': '记录 #', 'record_clear_btn': '清除',
+            'record_output': '总产出：', 'record_coin': ' 幸运币',
+            'record_miners': '總矿工：', 'record_person': ' 人',
+            'record_rounds_num': ' | 回合数：', 'record_rounds_unit': ' 回合',
+            'record_alloc_label': '矿区分配 (1-5-3): ', 'record_actual_act_label': '实际启动回合 (1-5-3)：', 
+            'record_manual_act_label': '手动启动回合 (2-5-3): ',
+            'toggle_expand': '查看详细表格 [+]' , 'toggle_collapse': '收起详细表格 [-]',
+            'alert_no_calc': '请先点击“开始计算”以获得结果！',
+            'confirm_clear_one': '确定要清除这笔记录吗？', 'confirm_clear_all': '确定要清除所有历史记录吗？',
+            // --- 錯誤訊息部分 ---
+            'error_prefix': '错误：',
+            'error_total_miners_label': '总矿工数',
+            'error_suffix': '超过上限',
+            // --------------------
+            'maker_label': '制作者', 
+            'disclaimer_note': '本网页由玩家无偿制作，仅供游戏同好交流与分享，数据如有误差，纯属正常，仅供参考使用。'
+        },
+        'en': {
+            'title': 'War Inc Rising Co-op Simulator', 
+            'main_title': 'War Inc Rising Co-op Simulator', 
+            'settings_title': 'Miner & Round Settings',
+            'settings_note1': 'The system assumes players have pre-prepared Lucky Coins (LC) for a one-time activation, unless manually overridden. Max total miners: 50.',
+            'miners_placeholder': 'Miners',
+            'rounds_label': 'Game Rounds',
+            'rounds_placeholder': '0 Rounds',
+            'manual_act_title': 'Manual Activation Round Settings',
+            'manual_act_note1': 'Enter 0 or leave blank for automatic calculation. Mines 5-2 and 5-3 are user-defined; if not entered, they default to inactive.', 
+            'act_rounds_placeholder': 'Round No.',
+            'calculate_btn': 'Start Simulation',
+            'download_btn': 'Save as Image',
+            'history_title': 'History Records',
+            'clear_all_btn': 'Clear All Records',
+            'history_placeholder': 'No records saved yet.',
+            'mine1_label': 'Mine 1 (15s)', 'mine2_label': 'Mine 2 (12s)', 'mine3_label': 'Mine 3 (9s)', 
+            'mine4_label': 'Mine 4 (6s)', 'mine5_1_label': 'Mine 5-1 (3s)', 'mine5_2_label': 'Mine 5-2 (3s)', 
+            'mine5_3_label': 'Mine 5-3 (3s)',
+            'output_title': 'Simulation Results',
+            'output_note': 'Output refers to the amount of Lucky Coins (LC).',
+            'save_record_btn': 'Save Record',
+            'table_mine': 'Mine', 'table_act_round': 'Act. Round', 'table_total_output': 'Total Output',
+            'table_total': 'Total',
+            'act_not_ready': 'Not Ready', 'act_no_alloc': 'No Miners',
+            'summary_alloc': 'Total Miners: ', 'summary_rounds': ' | Total Rounds: ', 'summary_sec': ' seconds)',
+            'summary_final_coin': ' | Final Lucky Coins: ',
+            'record_title_prefix': 'Record #', 'record_clear_btn': 'Clear',
+            'record_output': 'Total Output: ', 'record_coin': ' Lucky Coins',
+            'record_miners': 'Total Miners: ', 'record_person': ' Miners',
+            'record_rounds_num': ' | Rounds: ', 'record_rounds_unit': ' Rounds',
+            'record_alloc_label': 'Miner Allocation (1-5-3): ', 'record_actual_act_label': 'Actual Activation (1-5-3): ', 
+            'record_manual_act_label': 'Manual Activation (2-5-3): ',
+            'toggle_expand': 'View Details [+]' , 'toggle_collapse': 'Collapse Details [-]',
+            'alert_no_calc': 'Please click "Start Simulation" first to get results!',
+            'confirm_clear_one': 'Are you sure you want to clear this record?', 'confirm_clear_all': 'Are you sure you want to clear ALL historical records?',
+            // --- 錯誤訊息部分 ---
+            'error_prefix': 'ERROR: ',
+            'error_total_miners_label': 'Total Miners',
+            'error_suffix': 'exceeds max limit',
+            // --------------------
+            'maker_label': 'Creator', 
+            'disclaimer_note': 'This page is player-made for voluntary exchange and sharing among gaming enthusiasts. Any data errors are normal and for reference use only.'
+        }
+    };
+
+    function generateErrorMessage(totalAlloc) {
+        const langDict = translations[currentLanguage];
+        const MAX_ALLOC = 50;
+        let errorMsg = `${langDict['error_prefix']}${langDict['error_total_miners_label']} (${totalAlloc}) ${langDict['error_suffix']} ${MAX_ALLOC}`;
+        if (currentLanguage === 'zh-tw' || currentLanguage === 'zh-cn') {
+            errorMsg += '。';
+        } else if (currentLanguage === 'en') {
+            errorMsg += '.';
+        }
+        return errorMsg;
+    }
+    
+    // --- 新增的函式：翻譯錯誤訊息 ---
+    function translateErrorMessage() {
+        const msgEl = document.getElementById('message');
+        if (msgEl.style.display === 'block' && msgEl.textContent.includes(')')) {
+            // 假設顯示中的錯誤訊息是因為人數超限
+            const oldText = msgEl.textContent;
+            // 嘗試從舊的訊息中提取總礦工數 (假設格式為 '... (N) ...')
+            const match = oldText.match(/\((\d+)\)/);
+            const totalAlloc = match ? parseInt(match[1]) : 51; // 如果提取失敗，給一個大於 50 的預設值
+            
+            // 重新生成翻譯後的錯誤訊息
+            msgEl.innerText = generateErrorMessage(totalAlloc);
+        }
+    }
+    // ------------------------------------
+
+
+    function changeLanguage(selectElement) {
+        currentLanguage = selectElement.value;
+        const langDict = translations[currentLanguage];
+        
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            if (langDict[key]) {
+                if (el.tagName === 'BUTTON') {
+                    el.textContent = langDict[key];
+                } else if (el.tagName === 'TITLE') {
+                    document.title = langDict[key];
+                } else {
+                    el.textContent = langDict[key];
+                }
+            }
+        });
+        
+        document.querySelectorAll('[data-translate-placeholder]').forEach(input => {
+            const key = input.getAttribute('data-translate-placeholder');
+            if (langDict[key]) {
+                 input.placeholder = langDict[key];
+            }
+        });
+
+        document.documentElement.lang = currentLanguage;
+        
+        // 修正點 1: 翻譯錯誤訊息
+        translateErrorMessage();
+        
+        // 修正點 2: 翻譯並更新歷史紀錄
+        renumberRecords(); 
+        
+        // 修正點 3: 如果結果區塊顯示中，則強制重新計算一次 (重新生成翻譯後的表格)
+        if (document.getElementById('output').style.display === 'block') {
+             runSim();
+        }
+        // ------------------------------------
+    }
+    
+    function toggleTable(button) {
+        const container = button.nextElementSibling;
+        const isVisible = container.style.display === 'block';
+        const langDict = translations[currentLanguage];
+        
+        if (isVisible) {
+            container.style.display = 'none';
+            button.textContent = langDict['toggle_expand'];
+        } else {
+            container.style.display = 'block';
+            button.textContent = langDict['toggle_collapse'];
+        }
+    }
+
+    function readMinerInput(id) {
+        return Math.floor(Number(document.getElementById(id).value) || 0);
+    }
+    
+    function getActualAlloc(inputVal) {
+        return Math.max(1, inputVal);
+    }
+
+
+    function runSim(){
+        const langDict = translations[currentLanguage];
+
+        const m1_input = readMinerInput('m1');
+        const m2_input = readMinerInput('m2');
+        const m3_input = readMinerInput('m3');
+        const m4_input = readMinerInput('m4');
+        const m5_1_input = readMinerInput('m5_1');
+        const m5_2_input = readMinerInput('m5_2');
+        const m5_3_input = readMinerInput('m5_3');
+        
+        const rounds = Math.max(0, Math.floor(Number(document.getElementById('rounds').value) || 1)); 
+        
+        const totalAlloc = m1_input + m2_input + m3_input + m4_input + m5_1_input + m5_2_input + m5_3_input;
+        const MAX_ALLOC = 50;
+        
+        const msgEl = document.getElementById('message');
+        const summaryEl = document.getElementById('summary');
+        const outEl = document.getElementById('output');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        msgEl.style.display = 'none';
+        outEl.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        summaryEl.innerText = '';
+        currentCalculationData = null; 
+
+        if (totalAlloc > MAX_ALLOC) {
+            msgEl.style.display = 'block';
+            // 使用 generateErrorMessage 函式來確保翻譯正確
+            msgEl.innerText = generateErrorMessage(totalAlloc);
+            return;
+        }
+
+        if (rounds === 0) {
+            summaryEl.innerText = `${langDict['summary_alloc'].trim().replace('：', '')} = ${totalAlloc}；${langDict['rounds_label']} = 0 ${langDict['record_rounds_unit'].trim()}`;
+            return;
+        }
+        
+        const allocs = [
+            getActualAlloc(m1_input), getActualAlloc(m2_input), getActualAlloc(m3_input), 
+            getActualAlloc(m4_input), getActualAlloc(m5_1_input), getActualAlloc(m5_2_input), 
+            getActualAlloc(m5_3_input)
+        ];
+        
+        const act2 = Math.floor(Number(document.getElementById('act2').value) || 0);
+        const act3 = Math.floor(Number(document.getElementById('act3').value) || 0);
+        const act4 = Math.floor(Number(document.getElementById('act4').value) || 0);
+        const act5_1 = Math.floor(Number(document.getElementById('act5_1').value) || 0);
+        const act5_2 = Math.floor(Number(document.getElementById('act5_2').value) || 0);
+        const act5_3 = Math.floor(Number(document.getElementById('act5_3').value) || 0);
+
+
+        const intervals = [15, 12, 9, 6, 3, 3, 3];
+        const thresholds = [0, 10, 150, 500, 1000, 0, 0]; 
+        const manualActs = [0, act2, act3, act4, act5_1, act5_2, act5_3]; 
+        const totalSeconds = rounds * 15;
+        const MINE_COUNT = 7; 
+
+        let total = 1; 
+        const active = Array(MINE_COUNT).fill(false);
+        const finalActivationRound = Array(MINE_COUNT).fill(null);
+        let m5_1_actual_act = null; 
+        let m5_2_actual_act = null; 
+        const perRound = Array.from({length: rounds + 1}, () => Array(MINE_COUNT).fill(0));
+
+
+        // 礦區 1 永遠在回合 1 啟動
+        finalActivationRound[0] = 1;
+        active[0] = true;
+
+        // 處理 2/3/4/5-1 的手動啟動 (自動門檻或手動)
+        for (let i = 1; i <= 4; i++) { 
+            if (manualActs[i] > 0) {
+                finalActivationRound[i] = Math.min(rounds, manualActs[i]); 
+                active[i] = true;
+                if (i === 4) m5_1_actual_act = finalActivationRound[i];
+            }
+        }
+        
+        // 處理 5-2 和 5-3 的手動啟動 (純手動，且依賴前置礦區啟動)
+        if (manualActs[5] > 0) { 
+            // 5-2 的啟動回合
+            finalActivationRound[5] = Math.min(rounds, manualActs[5]); 
+        }
+        if (manualActs[6] > 0) {
+            // 5-3 的啟動回合
+            finalActivationRound[6] = Math.min(rounds, manualActs[6]);
+        }
+
+
+        for (let t = 1; t <= totalSeconds; t++){
+            const currentRound = Math.ceil(t / 15);
+            
+            if (currentRound > rounds) break;
+            
+            // 處理 2/3/4/5-1 的自動啟動 (如果沒有手動輸入)
+            for (let i = 1; i <= 4; i++){ 
+                if (manualActs[i] === 0) { 
+                    if (!active[i] && total >= thresholds[i]){
+                        finalActivationRound[i] = currentRound;
+                        active[i] = true;
+                        if (i === 4) m5_1_actual_act = currentRound;
+                    }
+                }
+            }
+            
+            // 確定 5-1 的實際啟動回合，無論是手動還是自動
+            if (active[4] && m5_1_actual_act === null && finalActivationRound[4]) {
+                   m5_1_actual_act = finalActivationRound[4];
+            }
+            
+            // 處理 5-2 的純手動啟動
+            if (manualActs[5] > 0) { 
+                if (m5_1_actual_act && currentRound >= m5_1_actual_act && currentRound >= finalActivationRound[5]) {
+                    // 確保 5-1 已經啟動，並且達到 5-2 的手動回合
+                    active[5] = true;
+                    if (m5_2_actual_act === null) m5_2_actual_act = finalActivationRound[5];
+                }
+            }
+            
+            // 處理 5-3 的純手動啟動
+            if (manualActs[6] > 0) { 
+                // 必須 5-2 也啟動 (如果 5-2 有手動回合輸入)
+                const isM5_2_Ready = (manualActs[5] === 0) ? active[4] : active[5]; 
+                
+                if (isM5_2_Ready && (manualActs[5] > 0 ? currentRound >= finalActivationRound[5] : currentRound >= m5_1_actual_act) && currentRound >= finalActivationRound[6]) {
+                    // 啟動條件：5-2 已經啟動或 5-2 無手動回合時 5-1 已啟動，且達到 5-3 的手動回合
+                    active[6] = true;
+                }
+            }
+
+
+            if (t > 15) {
+                for (let i = 0; i < MINE_COUNT; i++){
+                    // 檢查礦區是否已啟動，並且達到該礦區的啟動回合
+                    if (finalActivationRound[i] && currentRound >= finalActivationRound[i]){
+                        // 檢查是否是該礦區的出幣時間間隔
+                        if ((t - 1) % intervals[i] === 0) {
+                            const prod = allocs[i];
+                            total += prod;
+                            perRound[currentRound][i] += prod;
+                        }
+                    } else if (i === 5) {
+                       // 特殊處理 5-2: 如果 5-2 沒有輸入手動回合 (manualActs[5] == 0) 
+                       // 且 5-1 啟動了 (active[4] == true)，則 5-2 實際上不啟動
+                       if (manualActs[5] === 0 && active[4] && currentRound >= finalActivationRound[4]) {
+                           // 模擬 5-2 實際上沒有啟動
+                       }
+                    } else if (i === 6) {
+                       // 特殊處理 5-3: 如果 5-3 沒有輸入手動回合 (manualActs[6] == 0) 
+                       // 且 5-1 或 5-2 啟動了，則 5-3 實際上不啟動
+                       if (manualActs[6] === 0 && (active[4] || active[5]) && currentRound >= (finalActivationRound[4] || finalActivationRound[5])) {
+                           // 模擬 5-3 實際上沒有啟動
+                       }
+                    }
+                }
+            }
+        }
+        
+        const segCount = Math.ceil(rounds / 10);
+        const segRanges = [];
+        for (let s = 0; s < segCount; s++){
+            const start = s * 10 + 1;
+            const end = Math.min(rounds, (s + 1) * 10);
+            segRanges.push({start, end});
+        }
+
+        const perMineSeg = Array.from({length: MINE_COUNT}, () => Array(segCount).fill(0));
+        const segTotals = Array(segCount).fill(0);
+
+        for (let r = 1; r <= rounds; r++){
+            const segIdx = Math.floor((r - 1) / 10);
+            if (segIdx >= segCount) continue; 
+            for (let i = 0; i < MINE_COUNT; i++){
+                // 再次檢查是否已啟動
+                const mineActivated = finalActivationRound[i] && r >= finalActivationRound[i];
+                if (mineActivated){
+                    perMineSeg[i][segIdx] += perRound[r][i];
+                    segTotals[segIdx] += perRound[r][i];
+                }
+            }
+        }
+
+        const perMineTotal = perMineSeg.map(arr => arr.reduce((a, b) => a + b, 0));
+        const overallTotal = perMineTotal.reduce((a, b) => a + b, 0);
+
+
+        summaryEl.innerText = `${langDict['summary_alloc']}${totalAlloc} ${langDict['record_person'].trim()} ${langDict['summary_rounds']}${rounds} ${langDict['record_rounds_unit'].trim()} (${totalSeconds} ${langDict['summary_sec'].trim()} ${langDict['summary_final_coin']}${total}`;
+        
+        const mineNames = [
+            langDict['mine1_label'], langDict['mine2_label'], langDict['mine3_label'], langDict['mine4_label'], 
+            langDict['mine5_1_label'], langDict['mine5_2_label'], langDict['mine5_3_label']
+        ].map(name => name.split('(')[0].trim()); // 使用 trim() 移除前後空白
+        const inputAllocs = [m1_input, m2_input, m3_input, m4_input, m5_1_input, m5_2_input, m5_3_input]; 
+
+        let tableHtml = '<table>';
+        tableHtml += `<tr><th>${langDict['table_mine']}</th><th>${langDict['table_act_round']}</th>`;
+        segRanges.forEach(s => { tableHtml += `<th>${s.start}-${s.end}</th>`; });
+        tableHtml += `<th>${langDict['table_total_output']}</th></tr>`;
+
+        const finalActivationDisplayArray = []; 
+
+        for (let i = 0; i < MINE_COUNT; i++){
+            const mineName = mineNames[i];
+            const hasAllocated = inputAllocs[i] > 0;
+            
+            let act;
+            const activatedRound = finalActivationRound[i];
+            
+            if (activatedRound && activatedRound <= rounds) {
+                act = `${activatedRound}`;
+            } else if (i === 0) { 
+                act = '1'; // Mine 1 always starts at round 1
+            } else if (i <= 4) { 
+                // Mine 2, 3, 4, 5-1: automatic/manual trigger. 
+                act = hasAllocated ? langDict['act_not_ready'] : langDict['act_no_alloc'];
+            } else if (i === 5 || i === 6) { 
+                // Mine 5-2, 5-3: only manual trigger or no trigger.
+                if (manualActs[i] > 0) {
+                     // 如果有手動輸入，但未達到前置或回合數
+                     act = langDict['act_not_ready'];
+                } else {
+                     act = langDict['act_no_alloc'];
+                }
+            } else {
+                 act = langDict['act_no_alloc'];
+            }
+            
+            // 修正：如果實際有產出，則顯示回合數 (針對 5-2/5-3 這種會因前置條件失敗的)
+             if (perMineTotal[i] > 0 && activatedRound && activatedRound <= rounds) {
+                 act = `${activatedRound}`;
+             }
+            
+            finalActivationDisplayArray.push(act); 
+            
+            tableHtml += `<tr><td>${mineName}</td><td>${act}</td>`;
+            for (let s = 0; s < segCount; s++){
+                tableHtml += `<td>${perMineSeg[i][s]}</td>`;
+            }
+            tableHtml += `<td>${perMineTotal[i]}</td></tr>`;
+        }
+        
+        // 修正最終顯示陣列，對於手動啟動但實際未啟動的礦區 (5-2, 5-3)
+        for (let i = 5; i <= 6; i++) {
+            if (manualActs[i] > 0 && perMineTotal[i] === 0) {
+                 finalActivationDisplayArray[i] = langDict['act_not_ready'];
+            } else if (manualActs[i] === 0 && inputAllocs[i] > 0) {
+                 finalActivationDisplayArray[i] = langDict['act_not_ready'];
+            }
+        }
+        
+
+
+        tableHtml += `<tr class="table-footer"><td>${langDict['table_total']}</td><td></td>`;
+        for (let s = 0; s < segCount; s++){
+            tableHtml += `<td>${segTotals[s]}</td>`;
+        }
+        tableHtml += `<td>${overallTotal}</td></tr>`;
+        tableHtml += '</table>';
+
+
+        let outputHtml = `<div class="section-title">${langDict['output_title']}</div>`;
+        outputHtml += `<div class="note"><p>${langDict['output_note']}</p></div>`;
+        outputHtml += `<div class="table-wrapper">${tableHtml}</div>`; 
+        outputHtml += `<button class="btn btn-save" onclick="saveRecord()">${langDict['save_record_btn']}</button>`;
+
+        outEl.style.display = 'block';
+        outEl.innerHTML = outputHtml;
+        downloadBtn.style.display = 'block';
+
+        currentCalculationData = {
+            m: [m1_input, m2_input, m3_input, m4_input, m5_1_input, m5_2_input, m5_3_input], 
+            rounds: rounds,
+            act: [0, act2, act3, act4, act5_1, act5_2, act5_3], 
+            totalAlloc: totalAlloc,
+            overallTotal: overallTotal,
+            finalActivationDisplay: finalActivationDisplayArray, 
+            fullTableHtml: tableHtml 
+        };
+        
+        updateClearAllButtonVisibility();
+    }
+    
+    function renumberRecords() {
+        const historyContent = document.getElementById('history-content');
+        const records = historyContent.querySelectorAll('.history-card');
+        const recordsArray = Array.from(records).reverse(); 
+        recordIndex = 0; 
+        const langDict = translations[currentLanguage];
+        
+        document.getElementById('history-placeholder').textContent = langDict['history_placeholder'];
+
+        recordsArray.forEach((card, index) => {
+            recordIndex++;
+            const h3 = card.querySelector('h3');
+            if (h3) {
+                const oldContent = h3.querySelector('span');
+                const newSpan = document.createElement('span');
+                
+                const timeMatch = oldContent ? oldContent.textContent.match(/\(([^)]+)\)$/) : null;
+                const timeString = timeMatch ? ` (${timeMatch[1]})` : ` (${new Date().toLocaleTimeString()})`;
+
+                newSpan.innerHTML = `${langDict['record_title_prefix']}${recordIndex}${timeString}`;
+                
+                if (oldContent) {
+                    h3.replaceChild(newSpan, oldContent);
+                } else {
+                    h3.insertBefore(newSpan, h3.firstChild);
+                }
+            }
+            
+            card.querySelector('.btn-clear-record').textContent = langDict['record_clear_btn'];
+            card.querySelector('.toggle-btn').textContent = card.querySelector('.record-table-container').style.display === 'block' ? langDict['toggle_collapse'] : langDict['toggle_expand'];
+            
+            const data = JSON.parse(card.getAttribute('data-info'));
+            
+            let pTags = card.querySelectorAll('p');
+            if (pTags.length >= 3) {
+                 pTags[0].innerHTML = `${langDict['record_output']}<strong>${data.overallTotal}${langDict['record_coin']}</strong>`;
+                 pTags[1].innerHTML = `${langDict['record_miners']}<strong>${data.totalAlloc}${langDict['record_person']}</strong> ${langDict['record_rounds_num']}<strong>${data.rounds}${langDict['record_rounds_unit']}</strong>`;
+            }
+            
+            const translatedFinalActDisplay = data.finalActivationDisplay.map(status => {
+                if (status.match(/^\d+$/)) { 
+                    return status;
+                }
+                // 使用翻譯變量進行比對
+                const isNoAlloc = status.includes(translations['zh-tw']['act_no_alloc']) || status.includes(translations['zh-cn']['act_no_alloc']) || status.includes(translations['en']['act_no_alloc']);
+                const isNotReady = status.includes(translations['zh-tw']['act_not_ready']) || status.includes(translations['zh-cn']['act_not_ready']) || status.includes(translations['en']['act_not_ready']);
+
+
+                if (isNoAlloc) {
+                    return langDict['act_no_alloc'];
+                } else if (isNotReady) {
+                    return langDict['act_not_ready'];
+                } else {
+                    return status;
+                }
+            });
+
+
+            const allocsDiv = card.querySelector('.history-allocs');
+            if (allocsDiv) {
+                const mStr = data.m.slice(0, 4).join(' / ') + ' / ' + data.m.slice(4).join(' / ');
+                let allocsHTML = `<p>${langDict['record_alloc_label']}${mStr}</p>`;
+                
+                const actRoundsStr = translatedFinalActDisplay.slice(0, 4).join(' / ') + ' / ' + translatedFinalActDisplay.slice(4).join(' / ');
+                allocsHTML += `<p>${langDict['record_actual_act_label']}${actRoundsStr}</p>`;
+                
+                if (data.act.slice(1).some(a => a > 0)) {
+                    allocsHTML += `<p>${langDict['record_manual_act_label']}${data.act.slice(1).join(' / ')}</p>`;
+                }
+                allocsDiv.innerHTML = allocsHTML;
+            }
+            
+        });
+        
+        document.getElementById('clearAllBtn').textContent = langDict['clear_all_btn'];
+        updateClearAllButtonVisibility();
+    }
+    
+    function saveRecord() {
+        const langDict = translations[currentLanguage];
+        if (!currentCalculationData) {
+            alert(langDict['alert_no_calc']);
+            return;
+        }
+
+        const data = currentCalculationData;
+        const historyContent = document.getElementById('history-content');
+        const placeholder = document.getElementById('history-placeholder');
+        
+        if (placeholder) {
+            placeholder.style.display = 'none';
+        }
+        
+        const mStr = data.m.slice(0, 4).join(' / ') + ' / ' + data.m.slice(4).join(' / ');
+        const actRoundsStr = data.finalActivationDisplay.slice(0, 4).join(' / ') + ' / ' + data.finalActivationDisplay.slice(4).join(' / ');
+        
+        const currentTime = new Date().toLocaleTimeString();
+
+        const card = document.createElement('div');
+        card.className = 'history-card';
+        card.setAttribute('data-info', JSON.stringify({
+            m: data.m,
+            rounds: data.rounds,
+            act: data.act,
+            totalAlloc: data.totalAlloc,
+            overallTotal: data.overallTotal,
+            finalActivationDisplay: data.finalActivationDisplay
+        }));
+        
+        card.innerHTML = `
+            <h3>
+                <span>${langDict['record_title_prefix']}#N (${currentTime})</span>
+                <button class="btn-clear-record" onclick="removeRecord(this.parentNode.parentNode)">${langDict['record_clear_btn']}</button>
+            </h3>
+            <p>${langDict['record_output']}<strong>${data.overallTotal}${langDict['record_coin']}</strong></p>
+            <p>${langDict['record_miners']}<strong>${data.totalAlloc}${langDict['record_person']}</strong> ${langDict['record_rounds_num']}<strong>${data.rounds}${langDict['record_rounds_unit']}</strong></p>
+            
+            <div class="history-allocs">
+                <p>${langDict['record_alloc_label']}${mStr}</p>
+                <p>${langDict['record_actual_act_label']}${actRoundsStr}</p>
+                ${(data.act.slice(1).some(a => a > 0)) ? `<p>${langDict['record_manual_act_label']}${data.act.slice(1).join(' / ')}</p>` : ''}
+            </div>
+            
+            <span class="toggle-btn" onclick="toggleTable(this)">${langDict['toggle_expand']}</span>
+            <div class="record-table-container">
+                ${data.fullTableHtml}
+            </div>
+        `;
+
+        historyContent.insertBefore(card, historyContent.firstChild);
+        currentCalculationData = null; 
+        
+        renumberRecords(); 
+    }
+
+    function removeRecord(cardElement) {
+        const langDict = translations[currentLanguage];
+        if (confirm(langDict['confirm_clear_one'])) {
+            cardElement.remove();
+            const historyContent = document.getElementById('history-content');
+            if (historyContent.children.length === 0 || 
+                (historyContent.children.length === 1 && historyContent.children[0].id === 'history-placeholder')) {
+                document.getElementById('history-placeholder').style.display = 'block';
+                updateClearAllButtonVisibility();
+            } else {
+                renumberRecords(); 
+            }
+        }
+    }
+
+    function clearAllRecords() {
+        const langDict = translations[currentLanguage];
+        if (confirm(langDict['confirm_clear_all'])) {
+            const historyContent = document.getElementById('history-content');
+            historyContent.innerHTML = `<p class="note" id="history-placeholder" data-translate="history_placeholder">${langDict['history_placeholder']}</p>`;
+            updateClearAllButtonVisibility();
+            recordIndex = 0; 
+        }
+    }
+    
+    function updateClearAllButtonVisibility() {
+        const historyContent = document.getElementById('history-content');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        
+        const hasRecords = historyContent.children.length > 0 && 
+                            (historyContent.children.length > 1 || 
+                             historyContent.children[0].id !== 'history-placeholder');
+                            
+        clearAllBtn.style.display = hasRecords ? 'inline-block' : 'none';
+    }
+
+
+    function downloadImage() {
+        document.querySelectorAll('.record-table-container').forEach(container => {
+            container.style.display = 'block';
+        });
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            const langDict = translations[currentLanguage];
+            btn.textContent = langDict['toggle_collapse'];
+        });
+
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.style.display = 'none';
+
+        const saveBtn = document.querySelector('#output .btn-save');
+        if (saveBtn) saveBtn.style.display = 'none';
+        
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const clearAllBtnState = clearAllBtn.style.display;
+        clearAllBtn.style.display = 'none';
+        
+        document.querySelectorAll('.btn-clear-record').forEach(btn => btn.style.visibility = 'hidden');
+        
+        // 隱藏作者區塊，避免被截圖 (如果用戶只想要截圖計算結果)
+        const footerEl = document.querySelector('.app-footer');
+        const footerDisplayState = footerEl.style.display;
+        footerEl.style.display = 'none';
+
+
+        const element = document.getElementById('captureArea');
+        html2canvas(element, { 
+            scale: 2, 
+            logging: false, 
+            useCORS: true,
+            allowTaint: true 
+        }).then(canvas => {
+            let filename = 'Co-op_Simulator_Results.jpg'; // Updated
+            if (currentLanguage === 'zh-tw') {
+                filename = '協作模式模擬結果.jpg';
+            } else if (currentLanguage === 'zh-cn') {
+                filename = '协作模式模拟结果.jpg';
+            }
+            
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+        }).finally(() => {
+            downloadBtn.style.display = 'block';
+            if (saveBtn) saveBtn.style.display = 'block'; 
+            clearAllBtn.style.display = clearAllBtnState; 
+            
+            document.querySelectorAll('.btn-clear-record').forEach(btn => btn.style.visibility = 'visible');
+            // 恢復作者區塊
+            footerEl.style.display = footerDisplayState; 
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        currentLanguage = 'zh-tw'; 
+        // 修正：初始載入時不直接呼叫 changeLanguage，而是直接設定語言並初始化，避免不必要的重新計算。
+        // changeLanguage(document.getElementById('langSelect')); 
+        const langSelect = document.getElementById('langSelect');
+        currentLanguage = langSelect.value;
+        const langDict = translations[currentLanguage];
+        document.title = langDict['title']; // 設定標題
+        document.documentElement.lang = currentLanguage;
+        
+        // 首次載入時，如果設定了預設值（例如：回合數=1），需要計算一次以顯示摘要
+        runSim();
+    });
+</script>
+</body>
+</html>
